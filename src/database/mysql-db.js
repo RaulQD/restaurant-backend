@@ -3,10 +3,10 @@ import mysql from 'mysql2/promise';
 import 'dotenv/config';
 
 const config = {
-    host: process.env.MYSQL_HOST,
-    user: process.env.MYSQL_USER,
-    password: process.env.MYSQL_PASSWORD,
-    database: process.env.MYSQL_DATABASE,
+    host: 'localhost',
+    user: 'root',
+    password: '1234',
+    database: 'sistema_restaurant',
     port: 3306
 }
 
