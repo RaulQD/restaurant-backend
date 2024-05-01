@@ -5,5 +5,7 @@ const routes = Router();
 
 routes.get('/', DishesController.getDishes);
 routes.get('/:id', DishesController.getDishById);
-routes.post('/createDish', DishesController.createDish);
+routes.post('/create', DishesController.create);
+routes.put('/update/:id', DishesController.update);
+routes.delete('/delete/:id', DishesController.delete);
 export default routes;
