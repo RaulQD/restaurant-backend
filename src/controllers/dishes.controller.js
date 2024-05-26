@@ -8,10 +8,8 @@ export class DishesController {
         try {
             const { categoryName } = req.query;
             const dishes = await DishesModel.getAllDishes({ categoryName });
-            console.log(dishes);
             res.status(200).json(dishes);
         } catch (error) {
-            console.log(error);
             res.status(500).json({ message: error.message });
         }
     }
@@ -23,7 +21,6 @@ export class DishesController {
                 return res.status(400).json({ message: "Id must be a positive integer" });
             }
             const dish = await DishesModel.getDishById({ id });
-
             //SI NO SE ENCUENTRA NINGUN PLATO CON EL ID PROPORCIONADO
             if (dish.length === 0) {
                 return res.status(404).json({ message: `Dish with id ${id} not found`, status: 404 });
@@ -61,10 +58,10 @@ export class DishesController {
 
             //* OBTENER EL ID DEL PLATO PARA VALIDAR QUE EXISTA
             const dish = await DishesModel.getDishById({ id });
-            if (!dish) {
+            if (dish.length === 0) {
                 return res.status(404).json({ message: `Dish with id ${id} not found`, status: 404 });
             }
-            //* VALIDAR SI EL PLATO YA EXISTE EN LA BD CASO CONTRARIO ACTUALIZARLO
+            // * VALIDAR SI EL PLATO YA EXISTE EN LA BD CASO CONTRARIO ACTUALIZARLO
             if (dishesName !== dish.nombre) {
                 const dishWithSameName = await DishesModel.getDishByName({ dishesName });
                 if (dishWithSameName.length) {
@@ -73,6 +70,7 @@ export class DishesController {
             }
             const updateDish = await DishesModel.update({ dishesName, description, price, enable, id_category, id });
             res.json({ message: 'Dish updated successfully', status: 200, updateDish });
+            console.log(dish);
         } catch (error) {
             console.log(error);
             res.status(500).json({ message: error.message, status: 500 });
