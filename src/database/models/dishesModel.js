@@ -56,6 +56,8 @@ export class DishesModel {
     static async create(input) {
         try {
             const { dishes_name, description, price, image_url, id_category } = input;
+
+
             //INSERTAR EL PLATO EN LA TABLA DE PLATOS
             const [result] = await conn.query('INSERT INTO dishes(dishes_name, description,price,image_url) VALUES(?,?,?,?)', [dishes_name, description, price, image_url]);
             //OBTENER EL ID DEL PLATO CREADO
@@ -64,8 +66,17 @@ export class DishesModel {
             const [category] = await conn.query('SELECT * FROM category WHERE id_category = ?', [id_category]);
             //INSERTAR EL PLATO EN LA TABLA DE RELACION DE PLATOS Y CATEGORIAS
             await conn.query('INSERT INTO category_dishes(dish_id, category_id) VALUES(?,?)', [dishId, id_category]);
+
+            const newDish = {
+                id_dish: dishId,
+                dishes_name,
+                description,
+                price,
+                image_url,
+                category: category[0]
+            }
             //RETORNAR EL PLATO CREADO
-            return { ...input, id: dishId, category: category[0] };
+            return newDish;
         } catch (error) {
             console.log(error);
             throw new Error('Error al crear un plato');

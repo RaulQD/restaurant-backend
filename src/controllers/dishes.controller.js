@@ -104,7 +104,22 @@ export class DishesController {
             res.status(500).json({ message: error.message, status: 500 });
         }
     }
-
+    static async updateImage(req, res) {
+        try {
+            const { id } = req.params;
+            const { image_url } = req.body;
+            const dish = await DishesModel.getDishById({ id });
+            if (dish.length === 0) {
+                return res.status(404).json({ message: `Dish with id ${id} not found`, status: 404 });
+            }
+            image_url = await uploadFile(req.files, undefined, 'dishes');
+            await DishesModel.updateImageDishes({ id, image_url });
+            res.json({ message: 'Image updated successfully', status: 200 });
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ message: error.message, status: 500 });
+        }
+    }
     static async removeDishes(req, res) {
         try {
             const { id } = req.params;

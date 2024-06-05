@@ -34,7 +34,7 @@ export class UploadsController {
         models.image_url = image_url;
 
         //GUARDAR EN LA BASE DE DATOS
-        await DishesModel.update({ id, image_url: image_url });
+        await DishesModel.updateImageDishes({ id, image_url })
         res.json(models);
     }
 }
