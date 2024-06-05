@@ -4,7 +4,6 @@ import { CategoryModel } from "../database/models/categoryModel.js";
 export class CategoryController {
 
     static async getAllCategories(req, res) {
-
         try {
             const categories = await CategoryModel.getAllCategories();
             res.status(200).json(categories);
