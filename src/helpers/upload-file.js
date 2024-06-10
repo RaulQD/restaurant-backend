@@ -18,7 +18,7 @@ export const uploadFile = (files, allowedExtensions = ['png', 'jpg', 'jpeg', 'we
         }
 
         const fileName = uuid() + '.' + fileExtension;
-        const uploadPath = path.join(__dirname, '../../uploads', folder, fileName);
+        const uploadPath = path.join(__dirname, '../../uploads/', folder, fileName);
 
 
         file.mv(uploadPath, (err) => {

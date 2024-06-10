@@ -5,12 +5,11 @@ export class DishesModel {
     static async getAllDishes() {
         try {
             //OBTENER TODOS LOS PLATOS DE LA BASE DE DATOS 
-            const [result] = await conn.query('SELECT dishes.id_dish,dishes.dishes_name,dishes.description,dishes.price,dishes.available,dishes.image_url,dishes.created_at,Category.id_category,Category.category_name FROM Dishes JOIN Category_dishes ON Dishes.id_dish = Category_dishes.dish_id JOIN Category ON Category_dishes.category_id = Category.id_category ORDER BY Dishes.id_dish ASC;');
+            const [result] = await conn.query('SELECT dishes.id_dish,dishes.dishes_name,dishes.description,dishes.price,dishes.available,dishes.image_url,dishes.created_at,Category.id_category,Category.category_name FROM Dishes JOIN Category ON dishes.category_id = Category.id_category ORDER BY Dishes.id_dish ASC;');
             //SI NO SE ENCUENTRA NINGUN PLATO
             if (result.length === 0) {
                 return [];
             }
-
             return result;
         } catch (error) {
             if (error.code === 'ER_BAD_FIELD_ERROR')
@@ -22,7 +21,7 @@ export class DishesModel {
         try {
             const lowerCaseCategoryName = categoryName.toLowerCase();
             //OBTENER LOS PLATOS POR NOMBRE DE CATEGORIA
-            const [filterDishesByCategoryName] = await conn.query('SELECT dishes.id_dish,dishes.dishes_name,dishes.description,dishes.price,dishes.available,dishes.image_url,dishes.created_at,Category.id_category,Category.category_name FROM dishes JOIN Category_dishes ON dishes.id_dish = Category_dishes.dish_id JOIN Category ON Category_dishes.category_id = Category.id_category WHERE LOWER(category.category_name) =  ?', [lowerCaseCategoryName]);
+            const [filterDishesByCategoryName] = await conn.query('SELECT dishes.id_dish,dishes.dishes_name,dishes.description,dishes.price,dishes.available,dishes.image_url,dishes.created_at,Category.id_category,Category.category_name FROM dishes JOIN Category ON dishes.category_id = Category.id_category WHERE LOWER(category.category_name) =  ?', [lowerCaseCategoryName]);
             if (filterDishesByCategoryName.length === 0) {
                 return [];
             }
@@ -35,10 +34,10 @@ export class DishesModel {
     static async getDishById({ id }) {
         try {
 
-            const [getDishById] = await conn.query('SELECT dishes.id_dish,dishes.dishes_name,dishes.description,dishes.price,dishes.available,dishes.image_url,dishes.created_at, Category.id_category ,Category.category_name FROM Dishes JOIN Category_dishes ON Dishes.id_dish = Category_dishes.dish_id JOIN Category ON Category_dishes.category_id = Category.id_category WHERE id_dish = ?', [id]);
+            const [result] = await conn.query('SELECT dishes.id_dish, dishes.dishes_name, dishes.description, dishes.price, dishes.available, dishes.image_url, Dishes.created_at, Category.id_category, Category.category_name FROM Dishes JOIN category ON dishes.category_id = category.id_category WHERE id_dish = ? ', [id]);
 
-
-            return getDishById;
+            console.log('Resultado de la consulta:', result); // Registro de depuración
+            return result;
         } catch (error) {
             throw new Error('Error al obtener el plato por ID');
         }
@@ -55,27 +54,23 @@ export class DishesModel {
     }
     static async create(input) {
         try {
-            const { dishes_name, description, price, image_url, id_category } = input;
-
-
+            const { dishes_name, description, price, image_url, created_at, id_category } = input;
             //INSERTAR EL PLATO EN LA TABLA DE PLATOS
-            const [result] = await conn.query('INSERT INTO dishes(dishes_name, description,price,image_url) VALUES(?,?,?,?)', [dishes_name, description, price, image_url]);
-            //OBTENER EL ID DEL PLATO CREADO
+            const [result] = await conn.query('INSERT INTO dishes(dishes_name,description,price,image_url,category_id) VALUES (?,?,?,?,?)', [dishes_name, description, price, image_url, id_category]);
             const dishId = result.insertId;
-            //OBTENER LA CATEGORIA DEL PLATO CREADO
+            // OBTENER LA CATEGORÍA DEL PLATO CREADO
             const [category] = await conn.query('SELECT * FROM category WHERE id_category = ?', [id_category]);
-            //INSERTAR EL PLATO EN LA TABLA DE RELACION DE PLATOS Y CATEGORIAS
-            await conn.query('INSERT INTO category_dishes(dish_id, category_id) VALUES(?,?)', [dishId, id_category]);
-
+            // CREAR EL OBJETO DEL NUEVO PLATO
             const newDish = {
-                id_dish: dishId,
+                id: dishId,
                 dishes_name,
                 description,
                 price,
+                created_at,
                 image_url,
-                category: category[0]
-            }
-            //RETORNAR EL PLATO CREADO
+                category: category[0] // Asegurarse de que esté accediendo al primer (y único) resultado
+            };
+
             return newDish;
         } catch (error) {
             console.log(error);
@@ -85,8 +80,17 @@ export class DishesModel {
 
     static async update(input) {
         try {
-            const { id, dishes_name, description, price, avilable, image_url, id_category } = input;
-            const [result] = await conn.query('UPDATE dishes SET dishes_name = ?, description = ?, price = ?, avilable = ?, image_url = ?, id_category = ? WHERE id_dish = ?', [dishes_name, description, price, avilable, id_category, id]);
+            const { id, dishes_name, description, price, available, id_category } = input;
+            //ACTUALIZAR EL PLATO
+            const [result] = await conn.query('UPDATE dishes SET dishes_name = ?, description = ?, price = ?, available = ?,   WHERE id_dish = ?', [dishes_name, description, price, available, id]);
+            //ACTUALIZAR LA CATEGORIA DEL PLATO SI ES NECESARIO
+            if (id_category) {
+
+            }
+            //OBTENER EL PLATO ACTUALIZADO 
+
+
+
             return result;
         } catch (error) {
             console.error('Error al actualizar el plato:', error);
