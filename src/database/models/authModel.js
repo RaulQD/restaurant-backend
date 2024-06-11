@@ -5,11 +5,11 @@ export class AuthModel {
 
     static async createUser(data) {
 
-        const { first_name, last_name, password, email, phone } = data;
+        const { first_name, last_name, password, email, dni, phone } = data;
         try {
             const defaultRole = 3;
             //INSERTAR EL USUARIO EN LA TABLA DE USUARIOS
-            const [userResult] = await conn.query('INSERT INTO users (first_name,last_name, password, email, phone) VALUES (?,?,?,?,?)', [first_name, last_name, password, email, phone]);
+            const [userResult] = await conn.query('INSERT INTO users (first_name, last_name, password, email, dni, phone) VALUES (?,?,?,?,?,?)', [first_name, last_name, password, email, dni, phone]);
             //OBTENER EL ID DEL USUARIO CREADO
             const userId = userResult.insertId;
             const [rolResult] = await conn.query('SELECT * FROM roles WHERE id_rol = ?', [defaultRole]);
@@ -22,6 +22,7 @@ export class AuthModel {
                 first_name,
                 last_name,
                 email,
+                dni,
                 phone,
                 rol: rolResult[0]
             }
@@ -32,23 +33,22 @@ export class AuthModel {
     }
     static async createEmployee(data) {
         try {
-            const { first_name, last_name, password, email, phone, position, salary, id_rol } = data;
+            const { first_name, last_name, password, dni, email, phone, position, salary, id_rol } = data;
 
             //INSERTAR EL EMPLEADO EN LA TABLA DE USUARIOS
-            const [employeeResult] = await conn.query('INSERT INTO users (first_name,last_name, password, email, phone) VALUES (?,?,?,?,?)', [first_name, last_name, password, email, phone]);
+            const [employeeResult] = await conn.query('INSERT INTO users (first_name, last_name, password, email, dni, phone) VALUES (?,?,?,?,?,?)', [first_name, last_name, password, email, dni, phone]);
             //OBTENER EL ID DEL USUARIO CREADO
             const userId = employeeResult.insertId;
             //OBTENER EL ROL DEL EMPLEADO
             const [rolResult] = await conn.query('SELECT * FROM roles WHERE id_rol = ?', [id_rol]);
             //VERIFICAR SI ES UN ROL DE EMPLEADO O ADMINISTRADOR
-            let models;
 
             if (id_rol === 1) {
                 //INSERTAR EL EMPLEADO EN LA TABLA DE EMPLEADOS
-                models = await conn.query('INSERT INTO Employees (user_id, position, salary) VALUES (?,?,?)', [userId, position, salary]);
+                await conn.query('INSERT INTO Employees (user_id, position, salary) VALUES (?,?,?)', [userId, position, salary]);
             } else if (id_rol === 2) {
                 //INSERTAR EL EMPLEADO EN LA TABLA DE ADMINISTRADORES
-                models = await conn.query('INSERT INTO Employees (user_id, position, salary) VALUES (?,?,?)', [userId, position, salary]);
+                await conn.query('INSERT INTO Employees (user_id, position, salary) VALUES (?,?,?)', [userId, position, salary]);
             }
             //INSERTAR  EL USUARIO Y EL ROL EN LA TABLA DE USUARIOS_ROLES
             await conn.query('INSERT INTO user_roles (user_id,role_id) VALUES (?,?)', [userId, id_rol]);
@@ -58,6 +58,7 @@ export class AuthModel {
                 first_name,
                 last_name,
                 email,
+                dni,
                 phone,
                 employee: {
                     position,
