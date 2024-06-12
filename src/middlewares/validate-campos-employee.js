@@ -1,7 +1,7 @@
 
 export const validateFields = (req, res, next) => {
 
-    const { first_name, last_name, password, email, dni, phone, position, salary, id_rol } = req.body;
+    const { first_name, last_name, password, email, dni, phone, position, salary, roles } = req.body;
 
     //Validar que el nombre no este vacio
     if (!first_name || typeof first_name !== 'string' || first_name.trim() === '') {
@@ -40,7 +40,7 @@ export const validateFields = (req, res, next) => {
         return res.status(400).json({ message: ' Ingresa un salario valido', status: 400 });
     }
 
-    if (!id_rol || typeof id_rol !== 'number' || id_rol <= 0) {
+    if (!roles || !Array.isArray(roles) || roles.length === 0) {
         return res.status(400).json({ message: ' Seleccione un rol', status: 400 });
     }
     next();

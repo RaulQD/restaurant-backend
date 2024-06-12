@@ -33,25 +33,31 @@ export class AuthModel {
     }
     static async createEmployee(data) {
         try {
-            const { first_name, last_name, password, dni, email, phone, position, salary, id_rol } = data;
+            const { first_name, last_name, password, dni, email, phone, position, salary, roles } = data;
 
             //INSERTAR EL EMPLEADO EN LA TABLA DE USUARIOS
             const [employeeResult] = await conn.query('INSERT INTO users (first_name, last_name, password, email, dni, phone) VALUES (?,?,?,?,?,?)', [first_name, last_name, password, email, dni, phone]);
             //OBTENER EL ID DEL USUARIO CREADO
             const userId = employeeResult.insertId;
-            //OBTENER EL ROL DEL EMPLEADO
-            const [rolResult] = await conn.query('SELECT * FROM roles WHERE id_rol = ?', [id_rol]);
-            //VERIFICAR SI ES UN ROL DE EMPLEADO O ADMINISTRADOR
+            //INSERTAR EL EMPLEADO EN LA TABLA DE EMPLEADOS
+            await conn.query('INSERT INTO employees (user_id, position, salary) VALUES (?,?,?)', [userId, position, salary]);
 
-            if (id_rol === 1) {
-                //INSERTAR EL EMPLEADO EN LA TABLA DE EMPLEADOS
-                await conn.query('INSERT INTO Employees (user_id, position, salary) VALUES (?,?,?)', [userId, position, salary]);
-            } else if (id_rol === 2) {
-                //INSERTAR EL EMPLEADO EN LA TABLA DE ADMINISTRADORES
-                await conn.query('INSERT INTO Employees (user_id, position, salary) VALUES (?,?,?)', [userId, position, salary]);
+            //AGREGAR 1 O 2 ROLES DEPENDIENDO DEL ROL DEL EMPLEADO
+            for (const roleId of roles) {
+                await conn.query('INSERT INTO user_roles (user_id,role_id) VALUES (?,?)', [userId, roleId]);
             }
-            //INSERTAR  EL USUARIO Y EL ROL EN LA TABLA DE USUARIOS_ROLES
-            await conn.query('INSERT INTO user_roles (user_id,role_id) VALUES (?,?)', [userId, id_rol]);
+            //OBTENER EL ROL DEL EMPLEADO
+            const [rolesResult] = await conn.query('SELECT r.* FROM roles r JOIN user_roles ur ON r.id_rol = ur.role_id WHERE ur.user_id = ?', [userId]);
+
+            //OBTENER LOS ROLES DEL USUARIO EN UN ARRAY
+
+            const rolesGroup = rolesResult.map(role => {
+                return {
+                    id: role.id_rol,
+                    name: role.role_name
+                }
+            });
+
             //OBJETO CON LOS DATOS DEL EMPLEADO
             const employee = {
                 id: userId,
@@ -64,7 +70,7 @@ export class AuthModel {
                     position,
                     salary
                 },
-                rol: rolResult[0]
+                roles: rolesGroup
             }
             return employee;
 

@@ -80,16 +80,9 @@ export class DishesModel {
 
     static async update(input) {
         try {
-            const { id, dishes_name, description, price, available, id_category } = input;
+            const { id, dishes_name, description, price, available, updated_at, id_category } = input;
             //ACTUALIZAR EL PLATO
-            const [result] = await conn.query('UPDATE dishes SET dishes_name = ?, description = ?, price = ?, available = ?,   WHERE id_dish = ?', [dishes_name, description, price, available, id]);
-            //ACTUALIZAR LA CATEGORIA DEL PLATO SI ES NECESARIO
-            if (id_category) {
-
-            }
-            //OBTENER EL PLATO ACTUALIZADO 
-
-
+            const [result] = await conn.query('UPDATE dishes SET dishes_name = ?, description = ?, price = ?, available = ?, updated_at = ?, category_id = ? WHERE id_dish = ?', [dishes_name, description, price, available, updated_at, id_category, id]);
 
             return result;
         } catch (error) {
@@ -110,7 +103,9 @@ export class DishesModel {
     static async delete({ id }) {
         try {
             const [result] = await conn.query('DELETE FROM dishes WHERE id_dish = ?', [id]);
-            console.log(result);
+            //CAMBIAR EL ESTADO DEL PLATO A NO DISPONIBLE
+
+
             return result;
         } catch (error) {
             console.error('Error al eliminar el plato:', error);
