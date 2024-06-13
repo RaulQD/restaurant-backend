@@ -12,12 +12,26 @@ export class DishesController {
             if (result.length === 0) {
                 return res.status(404).json({ message: 'No se encontraron platos', status: 404, route: req.originalUrl });
             }
-
             //OBJETER EL RESULTADO EN UN OBJETO CON EL FORMATO DESEADO
             const dishes = result.map(resultToObjectWish);
             res.status(200).json(dishes);
         } catch (error) {
             res.status(500).json({ message: error.message });
+        }
+    }
+    static async getDishesAvailable(req, res) {
+        try {
+            const result = await DishesModel.getAllDishesAvailable();
+            if (result.length === 0) {
+                return res.status(404).json({ message: 'No se encontraron platos disponibles', status: 404, route: req.originalUrl });
+            }
+            //OBJETER EL RESULTADO EN UN OBJETO CON EL FORMATO DESEADO
+            const dishes = result.map(resultToObjectWish);
+
+            return res.status(200).json(dishes);
+        } catch (error) {
+            console.error('Error al obtener los platos disponibles:', error);
+            res.status(500).json({ message: 'Internal server error', status: 500, route: req.originalUrl });
         }
     }
     static async getDishesByCategoryName(req, res) {
@@ -52,7 +66,7 @@ export class DishesController {
             //OBJETER EL RESULTADO EN UN OBJETO CON EL FORMATO DESEADO
             const dish = result.map(resultToObjectWish);
             //RETORNAR EL RESULTADO
-            res.json(dish);
+            res.json(dish[0]);
         } catch (error) {
             console.error('Error al obtener el plato por ID: ', error);
             res.status(500).json({ message: 'Error al obtener el plato por ID:', status: 500, route: req.originalUrl });
@@ -86,7 +100,7 @@ export class DishesController {
     static async updateDishes(req, res) {
         try {
             const { id } = req.params;
-            const { dishes_name, description, price, available, updated_at, id_category } = req.body;
+            const { dishes_name, description, price, available, id_category } = req.body;
 
             //* OBTENER EL ID DEL PLATO PARA VALIDAR QUE EXISTA
             const dish = await DishesModel.getDishById({ id });
@@ -137,14 +151,10 @@ export class DishesController {
         try {
             const { id } = req.params;
             const dish = await DishesModel.delete({ id });
-
-
             //VERIFICAR SI EL PLATO EXISTE
             if (!dish || dish.length >= 0) {
                 return res.status(404).json({ message: `El plato con el id ${id} no existe`, status: 404 });
             }
-            //CAMBIAR EL ESTADO DEL PLATO A INACTIVO
-
             if (dish.affectedRows > 0) {
                 return res.json({ message: `El plato con el ID ${id} ha sido eliminado exitosamente`, status: 200 });
             }

@@ -17,6 +17,21 @@ export class DishesModel {
             throw new Error('Error al obtener los platos');
         }
     }
+    static async getAllDishesAvailable() {
+        try {
+            //OBTENER TODOS LOS PLATOS DISPONIBLES DE LA BASE DE DATOS 
+            const [result] = await conn.query('SELECT dishes.id_dish,dishes.dishes_name,dishes.description,dishes.price,dishes.available,dishes.image_url,dishes.created_at,Category.id_category,Category.category_name FROM Dishes JOIN Category ON dishes.category_id = Category.id_category WHERE dishes.available = 1 ORDER BY Dishes.id_dish ASC;');
+            //SI NO SE ENCUENTRA NINGUN PLATO
+            if (result.length === 0) {
+                return [];
+            }
+            return result;
+        } catch (error) {
+
+            console.error('Error al obtener los platos:', error);
+            throw new Error('Error al obtener los platos');
+        }
+    }
     static async getDishByCategoryName({ categoryName }) {
         try {
             const lowerCaseCategoryName = categoryName.toLowerCase();
@@ -102,9 +117,7 @@ export class DishesModel {
     }
     static async delete({ id }) {
         try {
-            const [result] = await conn.query('DELETE FROM dishes WHERE id_dish = ?', [id]);
-            //CAMBIAR EL ESTADO DEL PLATO A NO DISPONIBLE
-
+            const [result] = await conn.query('UPDATE dishes SET available = 0 WHERE id_dish = ?', [id]);
 
             return result;
         } catch (error) {
