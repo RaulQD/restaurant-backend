@@ -1,4 +1,4 @@
-import { CategoryModel } from "../database/models/categoryModel.js";
+import { CategoryModel } from "../models/category.js";
 
 
 export class CategoryController {

@@ -1,5 +1,5 @@
-import { AuthModel } from "../database/models/authModel.js";
-import { UserModel } from "../database/models/userModel.js";
+import { AuthModel } from "../models/authentication.js";
+import { UserModel } from "../models/users.js";
 import { checkCompare, hashPassword } from "../helpers/bcrypt.js";
 import { generateJWT } from "../helpers/jwt.js";
 

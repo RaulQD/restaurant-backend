@@ -1,4 +1,4 @@
-import { DishesModel } from "../database/models/dishesModel.js";
+import { DishesModel } from "../models/dishes.js";
 import { uploadFile } from "../helpers/upload-file.js";
 import { resultToObjectWish } from "../helpers/utils.js";
 
@@ -36,19 +36,20 @@ export class DishesController {
     }
     static async getDishesByCategoryName(req, res) {
         try {
-            const { categoryName } = req.query;
+            const { category } = req.query;
 
-            const dishesByCategoryName = await DishesModel.getDishByCategoryName({ categoryName });
+            const dishesByCategoryName = await DishesModel.getDishByCategoryName({ category });
             if (dishesByCategoryName.length === 0) {
-                return res.status(404).json({ message: `No se encontraron platos con la categoria: ${categoryName}`, status: 404, route: req.originalUrl });
+                return res.status(404).json({ message: `No se encontraron platos con la categoria: ${category}`, status: 404, route: req.originalUrl, result: dishesByCategoryName });
             }
             //OBJETER EL RESULTADO EN UN OBJETO CON EL FORMATO DESEADO
-            const dishesByCategory = dishesByCategoryName.map(resultToObjectWish);
+            const result = dishesByCategoryName.map(resultToObjectWish);
+
             //RETORNAR EL RESULTADO
-            res.status(200).json({ status: 200, route: req.originalUrl, dishesByCategory });
+            return res.status(200).json({ status: 200, route: req.originalUrl, result });
         } catch (error) {
             console.error('Error al obtener los platos por categoria:', error);
-            res.status(500).json({ message: 'Internal server error', status: 500, route: req.originalUrl });
+            return res.status(500).json({ message: 'Internal server error', status: 500, route: req.originalUrl });
         }
     }
     static async getDishById(req, res) {
@@ -66,13 +67,34 @@ export class DishesController {
             //OBJETER EL RESULTADO EN UN OBJETO CON EL FORMATO DESEADO
             const dish = result.map(resultToObjectWish);
             //RETORNAR EL RESULTADO
-            res.json(dish[0]);
+            return res.status(200).json(dish[0]);
         } catch (error) {
             console.error('Error al obtener el plato por ID: ', error);
-            res.status(500).json({ message: 'Error al obtener el plato por ID:', status: 500, route: req.originalUrl });
+            return res.status(500).json({ message: 'Error al obtener el plato por ID:', status: 500, route: req.originalUrl });
         }
 
     }
+    static async searchDishesByName(req, res) {
+        try {
+            const { name } = req.params;
+
+            console.log({ message: 'Nombre del plato recibido', name }); // Registro de depuración
+            const dishesByName = await DishesModel.findByDishName({ name });
+
+            if (dishesByName.length === 0) {
+                return res.status(400).json({ message: `No se encontraron platos con el nombre ${name}`, status: 400 })
+            }
+
+            const dishes = dishesByName.map(resultToObjectWish);
+
+            console.log('Resultado de la consulta:', dishes); // Registro de depuración
+            return res.status(200).json({ message: `Platos encontrados con el termino ${name}`, status: 200, route: req.originalUrl, dishes });
+        } catch (error) {
+            console.error('Error al obtener el plato por nombre:', error);
+            return res.status(500).json({ message: 'Internal server error', status: 500, route: req.originalUrl });
+        }
+    }
+
     static async addDishes(req, res) {
         try {
 
@@ -91,10 +113,10 @@ export class DishesController {
             }
             //*CREAR UN NUEVO PLATO
             const newDish = await DishesModel.create({ dishes_name, description, price, id_category });
-            res.status(201).json({ message: 'Plato creado exitosamente', status: 201, newDish });
+            return res.status(201).json({ message: 'Plato creado exitosamente', status: 201, newDish });
         } catch (error) {
             console.log(error);
-            res.status(500).json({ message: error.message, status: 500 });
+            return res.status(500).json({ message: error.message, status: 500 });
         }
     }
     static async updateDishes(req, res) {
@@ -107,6 +129,7 @@ export class DishesController {
             if (!dish || dish.length === 0) {
                 return res.status(404).json({ message: `El Plato con el ID ${id} no existe`, status: 404 });
             }
+
             // * VALIDAR SI EL PLATO YA EXISTE EN LA BD CASO CONTRARIO ACTUALIZARLO
             if (dishes_name && dishes_name !== dish[0].dishes_name) {
                 const dishWithSameName = await DishesModel.getDishByName({ dishes_name });
@@ -125,7 +148,7 @@ export class DishesController {
             }
 
             const updateDish = await DishesModel.update(updateData);
-            return res.json({ message: 'Plato actualizado exitosamente', status: 200, updateDish });
+            return res.json({ message: 'Plato actualizado exitosamente', status: 200, data: updateDish });
         } catch (error) {
             console.log(error);
             return res.status(500).json({ message: error.message, status: 500 });
@@ -151,17 +174,14 @@ export class DishesController {
         try {
             const { id } = req.params;
             const dish = await DishesModel.delete({ id });
-            //VERIFICAR SI EL PLATO EXISTE
-            if (!dish || dish.length >= 0) {
-                return res.status(404).json({ message: `El plato con el id ${id} no existe`, status: 404 });
+            if (dish.affectedRows === 0) {
+                return res.status(404).json({ message: `El plato con el id ${id} no existe `, status: 404 });
             }
-            if (dish.affectedRows > 0) {
-                return res.json({ message: `El plato con el ID ${id} ha sido eliminado exitosamente`, status: 200 });
-            }
-            return res.status(404).json({ message: `El plato con el id ${id} no existe `, status: 404 });
+            return res.json({ message: `El plato con el ID ${id} ha sido eliminado exitosamente`, status: 200 });
         } catch (error) {
             console.log(error);
-            res.status(500).json({ message: error.message, status: 500 });
+            return res.status(500).json({ message: error.message, status: 500 });
         }
     }
+
 }

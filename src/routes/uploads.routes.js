@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { UploadsController } from "../controllers/uploads.controller.js";
+import { UploadsController } from "../controllers/uploads..js";
 import { validateParams } from "../middlewares/validate-params.js";
 import { validatefiles } from "../middlewares/validate-files.js";
 

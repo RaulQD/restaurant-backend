@@ -1,4 +1,5 @@
-import conn from "../mysql-db.js";
+import pool from '../config/mysql-db.js';
+
 
 
 export class AuthModel {
@@ -9,13 +10,13 @@ export class AuthModel {
         try {
             const defaultRole = 3;
             //INSERTAR EL USUARIO EN LA TABLA DE USUARIOS
-            const [userResult] = await conn.query('INSERT INTO users (first_name, last_name, password, email, dni, phone) VALUES (?,?,?,?,?,?)', [first_name, last_name, password, email, dni, phone]);
+            const [userResult] = await pool.query('INSERT INTO users (first_name, last_name, password, email, dni, phone) VALUES (?,?,?,?,?,?)', [first_name, last_name, password, email, dni, phone]);
             //OBTENER EL ID DEL USUARIO CREADO
             const userId = userResult.insertId;
-            const [rolResult] = await conn.query('SELECT * FROM roles WHERE id_rol = ?', [defaultRole]);
-            await conn.query('INSERT INTO clients (user_id) VALUES (?)', [userId]);
+            const [rolResult] = await pool.query('SELECT * FROM roles WHERE id_rol = ?', [defaultRole]);
+            await pool.query('INSERT INTO clients (user_id) VALUES (?)', [userId]);
             //INSERTAR EL USUARIO Y EL ROL EN LA TABLA DE USUARIOS_ROLES
-            await conn.query('INSERT INTO user_roles (user_id,role_id) VALUES (?,?)', [userId, defaultRole]);
+            await pool.query('INSERT INTO user_roles (user_id,role_id) VALUES (?,?)', [userId, defaultRole]);
             //OBJETO CON LOS DATOS DEL USUARIO
             const user = {
                 id: userId,
@@ -36,18 +37,18 @@ export class AuthModel {
             const { first_name, last_name, password, dni, email, phone, position, salary, roles } = data;
 
             //INSERTAR EL EMPLEADO EN LA TABLA DE USUARIOS
-            const [employeeResult] = await conn.query('INSERT INTO users (first_name, last_name, password, email, dni, phone) VALUES (?,?,?,?,?,?)', [first_name, last_name, password, email, dni, phone]);
+            const [employeeResult] = await pool.query('INSERT INTO users (first_name, last_name, password, email, dni, phone) VALUES (?,?,?,?,?,?)', [first_name, last_name, password, email, dni, phone]);
             //OBTENER EL ID DEL USUARIO CREADO
             const userId = employeeResult.insertId;
             //INSERTAR EL EMPLEADO EN LA TABLA DE EMPLEADOS
-            await conn.query('INSERT INTO employees (user_id, position, salary) VALUES (?,?,?)', [userId, position, salary]);
+            await pool.query('INSERT INTO employees (user_id, position, salary) VALUES (?,?,?)', [userId, position, salary]);
 
             //AGREGAR 1 O 2 ROLES DEPENDIENDO DEL ROL DEL EMPLEADO
             for (const roleId of roles) {
-                await conn.query('INSERT INTO user_roles (user_id,role_id) VALUES (?,?)', [userId, roleId]);
+                await pool.query('INSERT INTO user_roles (user_id,role_id) VALUES (?,?)', [userId, roleId]);
             }
             //OBTENER EL ROL DEL EMPLEADO
-            const [rolesResult] = await conn.query('SELECT r.* FROM roles r JOIN user_roles ur ON r.id_rol = ur.role_id WHERE ur.user_id = ?', [userId]);
+            const [rolesResult] = await pool.query('SELECT r.* FROM roles r JOIN user_roles ur ON r.id_rol = ur.role_id WHERE ur.user_id = ?', [userId]);
 
             //OBTENER LOS ROLES DEL USUARIO EN UN ARRAY
 

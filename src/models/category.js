@@ -1,4 +1,4 @@
-import conn from "../mysql-db.js";
+import pool from '../config/mysql-db.js';
 
 
 
@@ -6,7 +6,7 @@ export class CategoryModel {
 
     static async getAllCategories() {
         try {
-            const [categories] = await conn.query('SELECT * FROM categorydishes');
+            const [categories] = await pool.query('SELECT * FROM categorydishes');
             return categories;
         } catch (error) {
             console.error('Error al obtener las categorias:', error);
@@ -15,7 +15,7 @@ export class CategoryModel {
     }
     static async getCategoryById({ id }) {
         try {
-            const [category] = await conn.query('SELECT * FROM categoryDishes WHERE id_category = ?', [id]);
+            const [category] = await pool.query('SELECT * FROM categoryDishes WHERE id_category = ?', [id]);
             if (!category || category.length === 0) {
                 return [];
             }
@@ -32,7 +32,7 @@ export class CategoryModel {
     }
     static async getCategoryByName({ categoryName }) {
         try {
-            const [category] = await conn.query('SELECT * FROM categoryDishes WHERE categoryName = ?', [categoryName]);
+            const [category] = await pool.query('SELECT * FROM categoryDishes WHERE categoryName = ?', [categoryName]);
             return category;
         } catch (error) {
             console.error('Error al obtener la categoria por nombre:', error);
@@ -43,7 +43,7 @@ export class CategoryModel {
         const { categoryName, enable } = input;
         try {
             const enableValue = enable ?? 'Active';
-            const [category] = await conn.query('INSERT INTO categoryDishes(categoryName, enable) VALUES ( ?,? )', [categoryName, enableValue])
+            const [category] = await pool.query('INSERT INTO categoryDishes(categoryName, enable) VALUES ( ?,? )', [categoryName, enableValue])
             return { id: category.insertId, categoryName, enable: enableValue }
         } catch (error) {
             console.error('Error al crear una categoria:', error);

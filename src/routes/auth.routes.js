@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { AuthController } from "../controllers/auth.controller.js";
+import { AuthController } from "../controllers/authentication.js";
 import { validateFieldsClient } from "../middlewares/validate-campos-client.js";
 import { validateFields } from "../middlewares/validate-campos-employee.js";
 
