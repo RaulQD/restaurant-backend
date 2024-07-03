@@ -80,6 +80,7 @@ export class UploadsController {
             const [public_id] = name.split('.');
             cloudinary.uploader.destroy(public_id);
         }
+
         const { tempFilePath } = req.files.file;
         const { secure_url } = await cloudinary.uploader.upload(tempFilePath)
         models.image_url = secure_url;

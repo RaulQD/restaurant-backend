@@ -64,18 +64,12 @@ export class DishesModel {
     }
     //FILTRAR LOS PLATOS POR NOMBRE DE CATEGORIA
     //PARA EL USUARIO CLIENTE Y ADMINISTRADOR
-    static async findByDishName({ name, category }) {
-
+    static async findByDishName({ name }) {
         try {
-            // let sql = `SELECT dishes.id_dish, dishes.dishes_name, dishes.description, dishes.price, dishes.available, dishes.image_url, dishes.created_at, category.id_category, category.category_name FROM dishes JOIN category ON dishes.category_id = category.id_category  ORDER BY dishes.id_dish ASC`
-            // if (name) {
-            //     let nameFilter = name.join("' , '")
-            //     sql += ` AND name IN()`
-            // }
             const searchName = '%' + name + '%';
             const searchLowerCase = searchName.toLowerCase();
             console.log('valor de la busqueda:', searchName);
-            const [result] = await pool.query('SELECT dishes.id_dish, dishes.dishes_name, dishes.description, dishes.price, dishes.available, dishes.image_url, dishes.created_at, category.id_category, category.category_name FROM dishes JOIN category ON dishes.category_id = category.id_category WHERE LOWER(dishes.dishes_name) LIKE ? ORDER BY dishes.id_dish ASC', [searchLowerCase]);
+            const [result] = await pool.query('SELECT dishes.id_dish, dishes.dishes_name, dishes.description, dishes.price, dishes.available, dishes.image_url, dishes.created_at, category.id_category, category.category_name FROM dishes JOIN category ON dishes.category_id = category.id_category WHERE LOWER(dishes.dishes_name) LIKE ? AND dishes.available = 1  ORDER BY dishes.id_dish ASC', [searchLowerCase]);
 
             console.log('Resultado de la consulta:', result); // Registro de depuración
             return result;
@@ -97,19 +91,20 @@ export class DishesModel {
     //PARA EL USUARIO ADMINISTRADOR
     static async create(input) {
         try {
-            const { dishes_name, description, price, image_url, created_at, id_category } = input;
+            const { dishes_name, description, price, image_url, id_category } = input;
             //INSERTAR EL PLATO EN LA TABLA DE PLATOS
             const [result] = await pool.query('INSERT INTO dishes(dishes_name,description,price,image_url,category_id) VALUES (?,?,?,?,?)', [dishes_name, description, price, image_url, id_category]);
             const dishId = result.insertId;
             // OBTENER LA CATEGORÍA DEL PLATO CREADO
-            const [category] = await conn.query('SELECT * FROM category WHERE id_category = ?', [id_category]);
+            const [category] = await pool.query('SELECT * FROM category WHERE id_category = ?', [id_category]);
+
+
             // CREAR EL OBJETO DEL NUEVO PLATO
             const newDish = {
                 id: dishId,
                 dishes_name,
                 description,
                 price,
-                created_at,
                 image_url,
                 category: category[0] // Asegurarse de que esté accediendo al primer (y único) resultado
             };
@@ -123,9 +118,9 @@ export class DishesModel {
     //PARA EL USUARIO ADMINISTRADOR
     static async update(input) {
         try {
-            const { id, dishes_name, description, price, available, updated_at, id_category } = input;
+            const { id, dishes_name, description, price, available, image_url, updated_at, id_category } = input;
             //ACTUALIZAR EL PLATO
-            const [result] = await pool.query('UPDATE dishes SET dishes_name = ?, description = ?, price = ?, available = ?, updated_at = ?, category_id = ? WHERE id_dish = ?', [dishes_name, description, price, available, updated_at, id_category, id]);
+            const [result] = await pool.query('UPDATE dishes SET dishes_name = ?, description = ?, price = ?, available = ?, image_url = ? , updated_at = ?, category_id = ? WHERE id_dish = ?', [dishes_name, description, price, available, image_url, updated_at, id_category, id]);
             return result;
         } catch (error) {
             console.error('Error al actualizar el plato:', error);

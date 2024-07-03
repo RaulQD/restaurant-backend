@@ -1,6 +1,7 @@
 import { DishesModel } from "../models/dishes.js";
 import { uploadFile } from "../helpers/upload-file.js";
 import { resultToObjectWish } from "../helpers/utils.js";
+import { deleteImage, uploadImage } from "../helpers/cloudinary.js";
 
 
 export class DishesController {
@@ -76,7 +77,7 @@ export class DishesController {
     }
     static async searchDishesByName(req, res) {
         try {
-            const { name } = req.params;
+            const { name } = req.query;
 
             console.log({ message: 'Nombre del plato recibido', name }); // Registro de depuración
             const dishesByName = await DishesModel.findByDishName({ name });
@@ -95,25 +96,33 @@ export class DishesController {
         }
     }
 
-    static async addDishes(req, res) {
+    static async createDishes(req, res) {
         try {
 
-            const { dishes_name, description, price, image_url, id_category } = req.body;
+            const { dishes_name, description, price, id_category } = req.body;
 
             //*VALIDAR SI EL PLATO YA EXISTE EN LA BASE DE DATOS
             const dishExist = await DishesModel.getDishByName({ dishes_name });
             if (dishExist.length) {
-                console.log(dishExist);
-                return res.status(400).json({ message: 'Dish already exists', status: 400 });
+                return res.status(400).json({ message: `El plato ${dishes_name} ya existe`, status: 400 });
             }
-
             //* VALIDAR SI SE SELECCIONO UNA CATEGORIA
             if (!id_category) {
-                return res.status(400).json({ message: 'Category is required', status: 400 });
+                return res.status(400).json({ message: 'Selecciona uan categoria', status: 400 });
             }
+            //AGREGAR UNA IMAGEN
+            let imageURL = '';
+            console.log(imageURL);
+            if (req.files?.image_url) {
+                const { tempFilePath } = req.files.image_url;
+                const result = await uploadImage(tempFilePath);
+                imageURL = result.secure_url; // Asignar la URL de la imagen subida
+            }
+
+            console.log({ 'archivo': req.files.image_url, 'imageURL': imageURL });
             //*CREAR UN NUEVO PLATO
-            const newDish = await DishesModel.create({ dishes_name, description, price, id_category });
-            return res.status(201).json({ message: 'Plato creado exitosamente', status: 201, newDish });
+            const data = await DishesModel.create({ dishes_name, description, price, image_url: imageURL, id_category });
+            return res.status(201).json({ message: 'Plato creado exitosamente', status: 201, data });
         } catch (error) {
             console.log(error);
             return res.status(500).json({ message: error.message, status: 500 });
@@ -129,7 +138,6 @@ export class DishesController {
             if (!dish || dish.length === 0) {
                 return res.status(404).json({ message: `El Plato con el ID ${id} no existe`, status: 404 });
             }
-
             // * VALIDAR SI EL PLATO YA EXISTE EN LA BD CASO CONTRARIO ACTUALIZARLO
             if (dishes_name && dishes_name !== dish[0].dishes_name) {
                 const dishWithSameName = await DishesModel.getDishByName({ dishes_name });
@@ -137,18 +145,31 @@ export class DishesController {
                     return res.status(400).json({ message: 'El nombre del plato existe', status: 400 });
                 }
             }
-            const updateData = {
+
+            //ACTUALIZAR UNA IMAGEN
+            let imageURL = dish[0].image_url;
+            if (imageURL) {
+                const nameArr = imageURL.split('/')
+                const name = nameArr[nameArr.length - 1];
+                const [public_id] = name.split('.');
+                await deleteImage(public_id);
+            }
+
+            const { tempFilePath } = req.files.image_url;
+            const { secure_url } = await uploadImage(tempFilePath);
+            imageURL = secure_url;
+
+            const updateDish = await DishesModel.update({
                 id,
                 dishes_name,
                 description,
                 price,
                 available,
+                image_url: imageURL,
                 updated_at: new Date(),
                 id_category
-            }
-
-            const updateDish = await DishesModel.update(updateData);
-            return res.json({ message: 'Plato actualizado exitosamente', status: 200, data: updateDish });
+            });
+            return res.status(200).json({ message: 'Plato actualizado exitosamente', status: 200, data: updateDish });
         } catch (error) {
             console.log(error);
             return res.status(500).json({ message: error.message, status: 500 });
@@ -160,7 +181,7 @@ export class DishesController {
             const { image_url } = req.body;
             const dish = await DishesModel.getDishById({ id });
             if (dish.length === 0) {
-                return res.status(404).json({ message: `Dish with id ${id} not found`, status: 404 });
+                return res.status(404).json({ message: `El plato con el ID ${id} no existe`, status: 404 });
             }
             image_url = await uploadFile(req.files, undefined, 'dishes');
             await DishesModel.updateImageDishes({ id, image_url });

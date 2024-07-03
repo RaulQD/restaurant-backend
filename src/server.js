@@ -15,8 +15,7 @@ const server = express();
 
 server.use(fileUpload({
     useTempFiles: true,
-    tempFileDir: '/tmp/',
-    createParentPath: true
+    tempFileDir: '/tmp/'
 }));
 server.use(express.json());
 server.use(express.urlencoded({ extended: true }));

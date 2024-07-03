@@ -26,8 +26,7 @@ export class UserController {
                 }
             })
 
-
-            res.status(200).json(employees);
+            res.status(200).json({ result: employees });
         } catch (error) {
             console.error('Error al obtener los empleados:', error);
             res.status(500).json({ message: 'Error al obtener los empleados', status: 500 });

@@ -1,5 +1,7 @@
 import { Router } from "express";
 import { DishesController } from "../controllers/dishes.js";
+import { validatefiles } from "../middlewares/validate-files.js";
+import { validateDishes } from "../middlewares/validate-fields-dishes.js";
 
 const routes = Router();
 
@@ -25,11 +27,7 @@ const routes = Router();
  *                  price:
  *                      type: integer
  *                      description: The price of the dish
- *                      example: S/.15.00
- *                  available:
- *                      type: boolean
- *                      description: The availability of the dish
- *                      example: true
+ *                      example: S/.15
  *                  category_id:
  *                      type: integer
  *                      description: The category id of the dish
@@ -59,6 +57,30 @@ routes.get('/', DishesController.getDishes);
 /**
  * @swagger
  * /api/v1/dishes/findByDishName:
+ *   get:
+ *     tags:
+ *       - Dishes
+ *     summary: Search for dishes by name
+ *     description: Returns a list of dishes matching the search criteria
+ *     parameters:
+ *       - in: query
+ *         name: name
+ *         description: Name of the dish to search for
+ *         required: false
+ *         schema:
+ *           type: string
+ *           example: "ta"
+ *     responses:
+ *       '200':
+ *         description: Successful Operation
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Dishes'
+ *       '400':
+ *         description: Not Found
  */
 routes.get('/findByDishName', DishesController.searchDishesByName)
 
@@ -72,7 +94,6 @@ routes.get('/available', DishesController.getDishesAvailable)
  *       - Dishes
  *     summary: Get dishes by category name
  *     description: Multiple Category values can be provided with comma separated strings
- *     operationId: findDishesByCategoryName
  *     parameters:
  *       - name: category
  *         in: query
@@ -115,7 +136,7 @@ routes.get('/findDishesByCategoryName', DishesController.getDishesByCategoryName
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             properties:
@@ -131,10 +152,10 @@ routes.get('/findDishesByCategoryName', DishesController.getDishesByCategoryName
  *                 type: number
  *                 description: The price of the dish
  *                 example: 15.00
- *               available:
- *                 type: boolean
- *                 description: The availability of the dish
- *                 example: true
+ *               image_url:
+ *                 type: string
+ *                 format: binary
+ *                 description: Imagen del plato
  *               id_category:
  *                 type: integer
  *                 description: The category id of the dish
@@ -150,7 +171,7 @@ routes.get('/findDishesByCategoryName', DishesController.getDishesByCategoryName
  *         description: Bad request - invalid input data
  */
 
-routes.post('/', DishesController.addDishes);
+routes.post('/', validatefiles, validateDishes, DishesController.createDishes);
 /**
  * @swagger
  * /api/v1/dishes/{id}:
