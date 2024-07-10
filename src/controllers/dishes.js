@@ -101,12 +101,12 @@ export class DishesController {
 
             const { dishes_name, description, price, id_category } = req.body;
 
-            //*VALIDAR SI EL PLATO YA EXISTE EN LA BASE DE DATOS
+            //VALIDAR SI EL PLATO YA EXISTE EN LA BASE DE DATOS
             const dishExist = await DishesModel.getDishByName({ dishes_name });
             if (dishExist.length) {
                 return res.status(400).json({ message: `El plato ${dishes_name} ya existe`, status: 400 });
             }
-            //* VALIDAR SI SE SELECCIONO UNA CATEGORIA
+            //VALIDAR SI SE SELECCIONO UNA CATEGORIA
             if (!id_category) {
                 return res.status(400).json({ message: 'Selecciona uan categoria', status: 400 });
             }
@@ -118,9 +118,7 @@ export class DishesController {
                 const result = await uploadImage(tempFilePath);
                 imageURL = result.secure_url; // Asignar la URL de la imagen subida
             }
-
-            console.log({ 'archivo': req.files.image_url, 'imageURL': imageURL });
-            //*CREAR UN NUEVO PLATO
+            //CREAR UN NUEVO PLATO
             const data = await DishesModel.create({ dishes_name, description, price, image_url: imageURL, id_category });
             return res.status(201).json({ message: 'Plato creado exitosamente', status: 201, data });
         } catch (error) {

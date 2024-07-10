@@ -4,11 +4,10 @@ export class DishesModel {
 
     //PARA EL USUARIO ADMINISTRADOR
     static async getAllDishes() {
-        let connection;
         try {
-            connection = await pool.getConnection();
+
             //OBTENER TODOS LOS PLATOS DE LA BASE DE DATOS 
-            const [result] = await connection.query('SELECT dishes.id_dish,dishes.dishes_name,dishes.description,dishes.price,dishes.available,dishes.image_url,dishes.created_at,Category.id_category,Category.category_name FROM Dishes JOIN Category ON dishes.category_id = Category.id_category ORDER BY Dishes.id_dish ASC;');
+            const [result] = await pool.query('SELECT dishes.id_dish,dishes.dishes_name,dishes.description,dishes.price,dishes.available,dishes.image_url,dishes.created_at,Category.id_category,Category.category_name FROM Dishes JOIN Category ON dishes.category_id = Category.id_category ORDER BY Dishes.id_dish ASC;');
             //SI NO SE ENCUENTRA NINGUN PLATO
             if (result.length === 0) {
                 return [];

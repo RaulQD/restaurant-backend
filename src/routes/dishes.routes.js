@@ -32,6 +32,10 @@ const routes = Router();
  *                      type: integer
  *                      description: The category id of the dish
  *                      example: 1
+ *                  image_url:
+ *                      type: string
+ *                      format: binary
+ *                      description: Imagen del plato
  * */
 
 /**
@@ -162,7 +166,7 @@ routes.get('/findDishesByCategoryName', DishesController.getDishesByCategoryName
  *                 example: 1
  *     responses:
  *       201:
- *         description: Dish updated successfully
+ *         description: Dish create successfully
  *         content:
  *           application/json:
  *             schema:

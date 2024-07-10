@@ -6,7 +6,7 @@ export class CategoryModel {
 
     static async getAllCategories() {
         try {
-            const [categories] = await pool.query('SELECT * FROM categorydishes');
+            const [categories] = await pool.query('SELECT * FROM category');
             return categories;
         } catch (error) {
             console.error('Error al obtener las categorias:', error);
@@ -15,7 +15,7 @@ export class CategoryModel {
     }
     static async getCategoryById({ id }) {
         try {
-            const [category] = await pool.query('SELECT * FROM categoryDishes WHERE id_category = ?', [id]);
+            const [category] = await pool.query('SELECT * FROM category WHERE id_category = ?', [id]);
             if (!category || category.length === 0) {
                 return [];
             }
@@ -32,7 +32,7 @@ export class CategoryModel {
     }
     static async getCategoryByName({ categoryName }) {
         try {
-            const [category] = await pool.query('SELECT * FROM categoryDishes WHERE categoryName = ?', [categoryName]);
+            const [category] = await pool.query('SELECT * FROM Category WHERE category_name = ?', [categoryName]);
             return category;
         } catch (error) {
             console.error('Error al obtener la categoria por nombre:', error);
@@ -40,11 +40,10 @@ export class CategoryModel {
         }
     }
     static async createCategory(input) {
-        const { categoryName, enable } = input;
+        const { category_name } = input;
         try {
-            const enableValue = enable ?? 'Active';
-            const [category] = await pool.query('INSERT INTO categoryDishes(categoryName, enable) VALUES ( ?,? )', [categoryName, enableValue])
-            return { id: category.insertId, categoryName, enable: enableValue }
+            const [category] = await pool.query('INSERT INTO category(category_name) VALUES ( ?)', [category_name])
+            return { id: category.insertId, category_name }
         } catch (error) {
             console.error('Error al crear una categoria:', error);
             throw new Error('Error al crear una categoria');
@@ -52,7 +51,7 @@ export class CategoryModel {
     }
     static async updateCategory(input) {
         try {
-            const { id, categoryName, enable } = input;
+            const { id, category_name, enable } = input;
             console.log(input);
 
         } catch (error) {

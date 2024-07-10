@@ -1,5 +1,7 @@
 import express from "express";
 import morgan from "morgan";
+import cors from "cors";
+import { corsConfig } from "./config/cors.js";
 import fileUpload from "express-fileupload";
 import swaggerUi from "swagger-ui-express";
 import swaggerSpec from "./config/swagger.js";
@@ -20,6 +22,7 @@ server.use(fileUpload({
 server.use(express.json());
 server.use(express.urlencoded({ extended: true }));
 server.use(morgan("dev"))
+server.use(cors(corsConfig));
 
 server.use('/api/v1/users', userRoutes)
 server.use('/api/v1/auth', authRoutes)

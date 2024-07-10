@@ -7,8 +7,8 @@ const router = Router();
 
 router.get('/', CategoryController.getAllCategories);
 router.get('/:id', CategoryController.getCategoryById);
-router.post('/create', CategoryController.createCategory);
-router.put('/update', CategoryController.updateCategory);
+router.post('/', CategoryController.createCategory);
+router.put('/', CategoryController.updateCategory);
 
 
 

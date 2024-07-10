@@ -6,6 +6,7 @@ export class CategoryController {
     static async getAllCategories(req, res) {
         try {
             const categories = await CategoryModel.getAllCategories();
+
             res.status(200).json(categories);
         } catch (error) {
             console.error('Error al obtener las categorias:', error);
@@ -31,16 +32,16 @@ export class CategoryController {
     }
     static async createCategory(req, res) {
         try {
-            const { categoryName, enable } = req.body;
+            const { category_name, enable } = req.body;
 
             // Check if the category already exists
-            const categoryExist = await CategoryModel.getCategoryByName({ categoryName });
+            const categoryExist = await CategoryModel.getCategoryByName({ category_name });
             if (categoryExist.length) {
                 console.log({ categoryExist }, 'Category already exists')
                 return res.status(400).json({ message: 'Category already exists', status: 400 });
             }
             // Create the category
-            const category = await CategoryModel.createCategory({ categoryName, enable });
+            const category = await CategoryModel.createCategory({ category_name, enable });
             return res.status(201).json({ message: 'Category created successfully', status: 201, category });
 
         } catch (error) {
