@@ -1,16 +1,13 @@
-
 export const validateDishes = (req, res, next) => {
+  const { name, description, originalPrice } = req.body
 
-
-  const { dishes_name, description, price } = req.body;
-
-  if (!dishes_name) {
+  if (!name) {
     return res.status(400).json({ message: 'Ingresa el nombre del plato', status: 400 })
   }
-  if (typeof dishes_name !== 'string') {
+  if (typeof name !== 'string') {
     return res.status(400).json({ message: 'El plato debe contener solo letras.' })
   }
-  if (dishes_name.length < 4) {
+  if (name.length < 4) {
     return res.status(400).json({ message: 'El plato debe tener por lo menos 4 caracteres.' })
   }
   if (!description) {
@@ -19,12 +16,11 @@ export const validateDishes = (req, res, next) => {
   if (description.length < 20) {
     return res.status(400).json({ message: 'La descripción del plato debe tener por lo menos 20 caracteres.', status: 400 })
   }
-  if (!price) {
+  if (!originalPrice) {
     return res.status(400).json({ message: 'Ingresa el precio del plato,', status: 400 })
   }
-  if (isNaN(parseFloat(price))) {
+  if (isNaN(parseFloat(originalPrice))) {
     return res.status(400).json({ message: 'El precio no es valido.', status: 400 })
   }
-  next();
-
+  next()
 }
