@@ -17,7 +17,7 @@ export const uploadFile = (files, allowedExtensions = ['png', 'jpg', 'jpeg', 'we
     const fileExtension = nameSplit[nameSplit.length - 1]
 
     if (!allowedExtensions.includes(fileExtension)) {
-      return reject(`La extensión del archivo ${fileExtension} no esta permitida. Porfavor usa uno de los permitidos ${allowedExtensions}`)
+      return reject(new Error(`La extensión del archivo ${fileExtension} no está permitida. Por favor, usa uno de los permitidos: ${allowedExtensions.join(', ')}`))
     }
 
     /* The code snippet you provided is generating a unique file name using the `uuid` function from

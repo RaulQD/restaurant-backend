@@ -12,6 +12,7 @@ import swaggerSpec from './config/swagger.js'
 import authRoutes from './routes/auth.routes.js'
 import dishesRoutes from './routes/dishes.routes.js'
 import categoryRoutes from './routes/category.routes.js'
+import uploadRoutes from './routes/uploads.routes.js'
 dotenv.config()
 connectDB()
 
@@ -19,7 +20,7 @@ const server = express()
 
 server.use(fileUpload({
   useTempFiles: true,
-  tempFileDir: '/tmp/'
+  tempFileDir: './uploads'
 }))
 server.use(express.json())
 server.use(express.urlencoded({ extended: true }))
@@ -30,6 +31,7 @@ server.use(cors(corsConfig))
 server.use('/api/v1/auth', authRoutes)
 server.use('/api/v1/dishes', dishesRoutes)
 server.use('/api/v1/category', categoryRoutes)
+server.use('/api/v1/uploads', uploadRoutes)
 
 // DOCS
 server.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec))

@@ -1,12 +1,12 @@
 export const validateFieldsClient = (req, res, next) => {
-  const { first_name, last_name, password, email, dni, phone } = req.body
+  const { name, lastName, password, email, dni, phone } = req.body
 
   // Validar que el nombre no este vacio
-  if (!first_name || typeof first_name !== 'string' || first_name.trim() === '') {
+  if (!name || typeof name !== 'string' || name.trim() === '') {
     return res.status(400).json({ message: ' Ingresa un nombre ', status: 400 })
   }
   // Validar que el apellido no este vacio
-  if (!last_name || typeof last_name !== 'string' || last_name.trim() === '') {
+  if (!lastName || typeof lastName !== 'string' || lastName.trim() === '') {
     return res.status(400).json({ message: ' Ingresa un apellido ', status: 400 })
   }
   // Validar que el DNI sea un numero de 8 digitos

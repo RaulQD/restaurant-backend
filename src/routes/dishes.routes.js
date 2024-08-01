@@ -1,15 +1,17 @@
 import { Router } from 'express'
 
-import { validateDishes } from '../middlewares/validate-fields-dishes.js'
-import { DishesController } from '../controllers/Dishes.controller.js'
+import { DishesController } from '../controllers/dishes.controller.js'
+import { validateDishes, validateDishesIdExist } from '../middlewares/dishes.js'
+import { validatefiles } from '../middlewares/validate-files.js'
 
 const routes = Router()
 
 routes.get('/', DishesController.getDishes)
 routes.post('/', validateDishes, DishesController.createDishes)
-routes.get('/:id', DishesController.getDishById)
-routes.put('/:id', validateDishes, DishesController.updateDishes)
-routes.delete('/:id', DishesController.removeDishes)
+routes.get('/:id', validateDishesIdExist, DishesController.getDishById)
+routes.put('/:id', validateDishesIdExist, validateDishes, validatefiles, DishesController.updateDishes)
+routes.delete('/:id', validateDishesIdExist, DishesController.removeDishes)
+routes.patch('/:id/status', validateDishesIdExist, DishesController.updatedDishesStatus)
 // routes.patch('/:id', DishesController.updateDishesAvailable);
 // routes.get('/', DishesController.getDishes);
 // routes.get('/findByDishName', DishesController.searchDishesByName)

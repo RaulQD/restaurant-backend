@@ -7,4 +7,14 @@ export const categorySchema = new Schema({
   timestamps: true
 })
 
+categorySchema.set('toJSON', {
+  virtuals: true,
+  versionKey: false,
+  transform: function (doc, ret, options) {
+    delete ret._id
+    delete ret.createdAt
+    delete ret.updatedAt
+  }
+})
+
 export const Category = mongoose.model('Category', categorySchema)

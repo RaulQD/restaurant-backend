@@ -31,13 +31,6 @@ export class CategoryController {
 
   static async getCategoryById (req, res) {
     try {
-      const { id } = req.params
-      const categoryId = mongoose.Types.ObjectId.isValid(id)
-      if (!categoryId) {
-        const error = new Error('El id de la categoria no es valido')
-        return res.status(400).json({ error: error.message, status: 400 })
-      }
-
       return res.status(200).json({ message: 'Categoria encontrada', status: 200, data: req.category })
     } catch (error) {
       console.log('Error al obtener la categoria:', error)
@@ -48,12 +41,7 @@ export class CategoryController {
   static async updateCategory (req, res) {
     try {
       const { id } = req.params
-      const { name } = req.body
-      const dishesId = mongoose.Types.ObjectId.isValid(id)
-      if (!dishesId) {
-        const error = new Error('El id del plato no es valido.')
-        return res.status(400).json({ error: error.message, status: 400 })
-      }
+      const { name, available } = req.body
       if (name) {
         const nameExist = await Category.findOne({ name, _id: { $ne: id } })
         if (nameExist) {
@@ -61,16 +49,28 @@ export class CategoryController {
           return res.status(409).json({ error: error.message, status: 409 })
         }
       }
-      const category = await Category.findByIdAndUpdate(id, req.body)
-      if (!category) {
-        const error = new Error('La categoria no existe')
-        return res.status(404).json({ error: error.message, status: 404 })
-      }
-      await category.save()
+      req.category.name = name
+      req.category.available = available
+      await req.category.save()
       return res.status(200).json({ message: 'Categoria actualizada exitosamente', status: 200 })
     } catch (error) {
       console.error('Error al actualizar la categoria:', error)
       return res.status(500).json({ message: 'Error al actualizar la categoria:', status: 500, route: req.originalUrl })
+    }
+  }
+
+  static async deleteCategory (req, res) {
+    try {
+      const category = await Category.findById(req.params.id)
+      if (!category) {
+        const error = new Error('La categoria no existe')
+        return res.status(404).json({ error: error.message, status: 404 })
+      }
+      await category.deleteOne()
+      return res.status(200).json({ message: 'Categoria eliminada exitosamente', status: 200 })
+    } catch (error) {
+      console.error('Error al eliminar la categoria:', error)
+      return res.status(500).json({ message: 'Error al eliminar la categoria:', status: 500, route: req.originalUrl })
     }
   }
 }

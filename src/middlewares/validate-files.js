@@ -1,9 +1,10 @@
 export const validatefiles = (req, res, next) => {
-  if (!req.files || Object.keys(req.files).length === 0 || !req.files.image_url) {
-    return res.status(400).json({ message: 'No se cargo ningun Archivo.' })
+  if (!req.files || Object.keys(req.files).length === 0 || !req.files.images) {
+    const error = new Error('No se cargo ningun Archivo.')
+    return res.status(400).json({ error: error.message })
   }
   // Obtiene el archivo
-  const file = req.files.image_url
+  const file = req.files.images
 
   // Lista de extensiones permitidas
   const allowedExtensions = ['png', 'jpg', 'jpge', 'webp']
