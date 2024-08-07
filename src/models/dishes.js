@@ -4,7 +4,10 @@ export const statusDishes = {
   ACTIVE: 'active',
   INACTIVE: 'inactive'
 }
-
+export const availableDishes = {
+  AVAILABLE: 'available',
+  UNAVAILABLE: 'unavailable'
+}
 const dishSchema = new Schema({
   name: { type: String, required: true, trim: true },
   description: { type: String, required: true, trim: true },

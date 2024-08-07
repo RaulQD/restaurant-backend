@@ -7,9 +7,9 @@ import { validatefiles } from '../middlewares/validate-files.js'
 const routes = Router()
 
 routes.get('/', DishesController.getDishes)
-routes.post('/', validateDishes, DishesController.createDishes)
+routes.post('/', DishesController.createDishes)
 routes.get('/:id', validateDishesIdExist, DishesController.getDishById)
-routes.put('/:id', validateDishesIdExist, validateDishes, validatefiles, DishesController.updateDishes)
+routes.put('/:id', validateDishesIdExist, DishesController.updateDishes)
 routes.delete('/:id', validateDishesIdExist, DishesController.removeDishes)
 routes.patch('/:id/status', validateDishesIdExist, DishesController.updatedDishesStatus)
 // routes.patch('/:id', DishesController.updateDishesAvailable);

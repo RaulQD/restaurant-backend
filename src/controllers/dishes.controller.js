@@ -18,6 +18,12 @@ export class DishesController {
         const error = new Error('La categoria no existe')
         return res.status(404).json({ error: error.message, status: 404 })
       }
+
+      // AGREGAR UNA IMAGEN POR DEFECTO
+      // const defaultImageUrl = '.https://res.cloudinary.com/dekcwdwcl/image/upload/v1722888130/no-image_zlqdcz.jpg'
+      // if (!req.files?.images) {
+      //   req.body.images = defaultImageUrl
+      // }
       const dishes = new Dishes(req.body)
       // AGREGAR UNA IMAGEN
       if (req.files?.images) {
@@ -38,13 +44,15 @@ export class DishesController {
   static async getDishes (req, res) {
     try {
       const { page = 1, limit = 10 } = req.query
-      // CONVERTIR A NUMEROS
-
       const query = { status: 'active' }
+      // CONVERTIR EL LIMIT Y PAGE A NUMEROS
+      const limitNumber = Number(limit)
+      const pageNumber = Number(page)
+
       const [dishes, totalDishes] = await Promise.all([
         Dishes.find(query)
-          .skip((Number(page) - 1) * Number(limit))
-          .limit(Number(limit))
+          .skip((page - 1) * limit)
+          .limit(limit)
           .populate('category'),
         Dishes.countDocuments(query)
       ])
@@ -59,7 +67,7 @@ export class DishesController {
         category: dish.category,
         images: dish.images
       }))
-      return res.json({ result: data, pagination: { page, limit, totalDishes } })
+      return res.json({ result: data, pagination: { page: pageNumber, limit: limitNumber, totalDishes } })
     } catch (error) {
       console.error('Error al obtener los platos:', error)
       return res.status(500).json({ message: 'Error al obtener los platos:', status: 500, route: req.originalUrl })
@@ -68,14 +76,13 @@ export class DishesController {
 
   static async getDishById (req, res) {
     try {
-      const dish = await Dishes.findById(req.params.id).populate('category')
+      const dish = await Dishes.findById(req.params.id)
       if (!dish) {
-        const error = new Error('El plato no existe')
-        return res.status(404).json({ error: error.message, status: 404 })
+        const error = new Error('Plato no encontrado')
+        return res.status(404).json({ error: error.message })
       }
-      return res.status(200).json({ status: 'success', lenght: dish.length, data: { dish } })
+      return res.status(200).json(dish)
     } catch (error) {
-      console.error('Error al obtener el plato:', error)
       return res.status(500).json({ message: 'Error al obtener el plato:', status: 500, route: req.originalUrl })
     }
   }
@@ -97,16 +104,16 @@ export class DishesController {
         return res.status(404).json({ error: error.message, status: 404 })
       }
       // ACTUALIZAR UNA IMAGEN
-      if (req.files?.images) {
-        const nameArr = dish.images.split('/')
-        const nameFile = nameArr[nameArr.length - 1]
-        const [public_id] = nameFile.split('.')
-        await deleteImage(public_id)
-      }
-      const { tempFilePath } = req.files.images
-      const { secure_url } = await uploadImage(tempFilePath)
-      fs.unlinkSync(tempFilePath)
-      dish.images = secure_url
+      // if (req.files?.images) {
+      //   const nameArr = dish.images.split('/')
+      //   const nameFile = nameArr[nameArr.length - 1]
+      //   const [public_id] = nameFile.split('.')
+      //   await deleteImage(public_id)
+      // }
+      // const { tempFilePath } = req.files.images
+      // const { secure_url } = await uploadImage(tempFilePath)
+      // fs.unlinkSync(tempFilePath)
+      // dish.images = secure_url
       await dish.save()
       return res.status(200).json({ message: 'Plato actualizado exitosamente', status: 200, data: dish })
     } catch (error) {

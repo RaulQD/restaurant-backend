@@ -16,7 +16,7 @@ export const validateDishesIdExist = async (req, res, next) => {
 
 export const validateDishes = (req, res, next) => {
   const { name, description, originalPrice } = req.body
-
+  console.log('Received data:', req.body)
   if (!name) {
     return res.status(400).json({ message: 'Ingresa el nombre del plato', status: 400 })
   }
@@ -32,11 +32,14 @@ export const validateDishes = (req, res, next) => {
   if (description.length < 20) {
     return res.status(400).json({ message: 'La descripción del plato debe tener por lo menos 20 caracteres.', status: 400 })
   }
+
   if (!originalPrice) {
     return res.status(400).json({ message: 'Ingresa el precio del plato,', status: 400 })
   }
-  if (isNaN(parseFloat(originalPrice))) {
+  const parsedprice = parseFloat(originalPrice)
+  if (isNaN(parsedprice)) {
     return res.status(400).json({ message: 'El precio no es valido.', status: 400 })
   }
+
   next()
 }
