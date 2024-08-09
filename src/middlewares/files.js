@@ -1,7 +1,7 @@
 export const validatefiles = (req, res, next) => {
   // Verifica si se ha cargado un archivo
   if (!req.files || Object.keys(req.files).length === 0 || !req.files.images) {
-    const error = new Error('No se cargo ningun Archivo.')
+    const error = new Error('No se cargo ninguna imagen.')
     return res.status(400).json({ error: error.message })
   }
   // Obtiene el archivo

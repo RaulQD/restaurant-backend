@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { UploadController } from '../controllers/upload.controller.js'
-import { validatefiles } from '../middlewares/validate-files.js'
+import { validatefiles } from '../middlewares/files.js'
 import { validateDishesIdExist } from '../middlewares/dishes.js'
 
 const routes = Router()

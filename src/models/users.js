@@ -1,11 +1,27 @@
 import mongoose, { Schema } from 'mongoose'
 
-export const userSchema = new Schema({
-  email: { type: String, required: true, trim: true, unique: true },
+const userSchema = new Schema({
+  email: { type: String, required: true, trim: true, unique: true, lowercase: true },
   password: { type: String, required: true, trim: true },
-  role: { type: [String], enum: ['ADMIN_ROLE', 'USER_ROLE', 'EMPLOYEE_ROLE'], default: 'USER_ROLE' }
+  firstName: { type: String, required: true, trim: true },
+  lastName: { type: String, required: true, trim: true },
+  phone: { type: String, trim: true },
+  address: { type: String, trim: true },
+  image: { type: String },
+  roles: [{ ref: 'Role', type: Schema.Types.ObjectId }]
 }, {
   timestamps: true
+})
+
+userSchema.set('toJSON', {
+  virtuals: true,
+  versionKey: false,
+  transform: function (doc, ret, options) {
+    delete ret._id
+    delete ret.password
+    delete ret.createdAt
+    delete ret.updatedAt
+  }
 })
 
 export const User = mongoose.model('User', userSchema)

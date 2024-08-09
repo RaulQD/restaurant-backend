@@ -1,5 +1,5 @@
 import fs from 'fs'
-import { deleteImage, uploadImage } from '../helpers/cloudinary.js'
+import { deleteImage, uploadImage } from '../utils/cloudinary.js'
 import { Dishes } from '../models/Dishes.js'
 
 export class UploadController {

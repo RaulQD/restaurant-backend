@@ -2,7 +2,7 @@ import fs from 'fs'
 import { request, response } from 'express'
 import { Dishes, statusDishes } from '../models/Dishes.js'
 import { Category } from '../models/Category.js'
-import { deleteImage, uploadImage } from '../helpers/cloudinary.js'
+import { deleteImage, uploadImage } from '../utils/cloudinary.js'
 
 export class DishesController {
   static async createDishes (req, res) {
@@ -25,13 +25,6 @@ export class DishesController {
       //   req.body.images = defaultImageUrl
       // }
       const dishes = new Dishes(req.body)
-      // AGREGAR UNA IMAGEN
-      if (req.files?.images) {
-        const { tempFilePath } = req.files.images
-        const result = await uploadImage(tempFilePath)
-        dishes.images = result.secure_url
-        fs.unlinkSync(tempFilePath)
-      }
       dishes.category = category
       await dishes.save()
       return res.status(201).json({ message: 'Plato creado exitosamente', status: 201, data: dishes })

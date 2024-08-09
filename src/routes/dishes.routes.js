@@ -2,12 +2,12 @@ import { Router } from 'express'
 
 import { DishesController } from '../controllers/dishes.controller.js'
 import { validateDishes, validateDishesIdExist } from '../middlewares/dishes.js'
-import { validatefiles } from '../middlewares/validate-files.js'
+import { validatefiles } from '../middlewares/files.js'
 
 const routes = Router()
 
 routes.get('/', DishesController.getDishes)
-routes.post('/', DishesController.createDishes)
+routes.post('/', validateDishes, DishesController.createDishes)
 routes.get('/:id', validateDishesIdExist, DishesController.getDishById)
 routes.put('/:id', validateDishesIdExist, DishesController.updateDishes)
 routes.delete('/:id', validateDishesIdExist, DishesController.removeDishes)
