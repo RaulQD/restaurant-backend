@@ -1,13 +1,13 @@
-export class ClientController {
+export class UserController {
   static async createClient (req, res) {
     res.send('createClient')
   }
 
-  static async getClients (req, res) {
+  static async getUsers (req, res) {
     res.send('getClients')
   }
 
-  static async getClient (req, res) {
+  static async getUserById (req, res) {
     res.send('getClient')
   }
 

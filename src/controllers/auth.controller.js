@@ -1,6 +1,7 @@
+import { generateJWT } from '../helpers/jwt.js'
 import { Role } from '../models/Role.js'
 import { User } from '../models/Users.js'
-import { hashPassword } from '../utils/bcrypt.js'
+import { checkCompare, hashPassword } from '../utils/bcrypt.js'
 
 export class AuthController {
   static async createAccount (req, res) {
@@ -33,16 +34,21 @@ export class AuthController {
   static async login (req, res) {
     try {
       const { email, password } = req.body
-      const userFound = await User.findOne({ email })
-      if (!userFound) {
-        const error = new Error('Usuariono existe')
+      const user = await User.findOne({ email })
+      if (!user) {
+        const error = new Error('Usuario no existe')
         return res.status(404).json({ message: error.message, status: false })
       }
-      console.log(userFound)
-      res.send('login')
+      const isPasswordMatch = await checkCompare(password, user.password)
+      if (!isPasswordMatch) {
+        const error = new Error('Contraseña incorrecta')
+        return res.status(400).json({ message: error.message, status: false })
+      }
+      const token = generateJWT({ id: user._id })
+      return res.status(200).json({ message: 'Inicio de sesión exitoso', status: true, data: { user, token } })
     } catch (error) {
       console.log('error', error)
-      res.status(500).json({ message: 'Internal server error' })
+      return res.status(500).json({ message: 'Internal server error' })
     }
   }
 }

@@ -15,7 +15,8 @@ const dishSchema = new Schema({
   available: { type: Boolean, default: true },
   images: { type: String },
   status: { type: String, enum: Object.values(statusDishes), default: statusDishes.ACTIVE },
-  category: { type: Schema.Types.ObjectId, ref: 'Category' }
+  category: { type: Schema.Types.ObjectId, ref: 'Category' },
+  user: { type: Schema.Types.ObjectId, ref: 'User' }
 }, {
   timestamps: true
 })

@@ -25,6 +25,7 @@ export class DishesController {
       //   req.body.images = defaultImageUrl
       // }
       const dishes = new Dishes(req.body)
+      dishes.user = req.user._id
       dishes.category = category
       await dishes.save()
       return res.status(201).json({ message: 'Plato creado exitosamente', status: 201, data: dishes })
@@ -46,21 +47,12 @@ export class DishesController {
         Dishes.find(query)
           .skip((page - 1) * limit)
           .limit(limit)
+          .populate('user', 'firstName lastName')
           .populate('category'),
         Dishes.countDocuments(query)
       ])
-
-      const data = dishes.map(dish => ({
-        id: dish._id,
-        name: dish.name,
-        originalPrice: dish.originalPrice,
-        description: dish.description,
-        available: dish.available,
-        status: dish.status,
-        category: dish.category,
-        images: dish.images
-      }))
-      return res.json({ result: data, pagination: { page: pageNumber, limit: limitNumber, totalDishes } })
+      console.log('dishes', dishes)
+      return res.json({ result: dishes, pagination: { page: pageNumber, limit: limitNumber, totalDishes } })
     } catch (error) {
       console.error('Error al obtener los platos:', error)
       return res.status(500).json({ message: 'Error al obtener los platos:', status: 500, route: req.originalUrl })

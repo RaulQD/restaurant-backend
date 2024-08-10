@@ -1,6 +1,6 @@
 import mongoose, { Schema } from 'mongoose'
 
-export const categorySchema = new Schema({
+const categorySchema = new Schema({
   name: { type: String, required: true, trim: true },
   available: { type: Boolean, default: true }
 }, {
