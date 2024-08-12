@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken'
 import { User } from '../models/Users.js'
 import { Role } from '../models/Role.js'
 
-export const isAuthenticated = async (req, res, next) => {
+export const validateToken = async (req, res, next) => {
   // OBTIENE EL TOKEN DE LA CABECERA
   const bearer = req.headers.authorization
   if (!bearer) { // SI NO HAY TOKEN RETORNA UN MENSAJE DE ERROR
