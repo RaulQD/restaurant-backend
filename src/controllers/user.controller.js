@@ -1,6 +1,6 @@
 export class UserController {
-  static async createClient (req, res) {
-    res.send('createClient')
+  static async getCurrentUser (req, res) {
+    return res.json(req.user)
   }
 
   static async getUsers (req, res) {

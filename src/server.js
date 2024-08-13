@@ -8,7 +8,7 @@ import fileUpload from 'express-fileupload'
 import swaggerUi from 'swagger-ui-express'
 import swaggerSpec from './config/swagger.js'
 
-// import userRoutes from './routes/user.routes.js'
+import userRoutes from './routes/user.routes.js'
 import authRoutes from './routes/auth.routes.js'
 import dishesRoutes from './routes/dishes.routes.js'
 import categoryRoutes from './routes/category.routes.js'
@@ -27,7 +27,7 @@ server.use(express.urlencoded({ extended: true }))
 server.use(morgan('dev'))
 server.use(cors(corsConfig))
 
-// server.use('/api/v1/users', userRoutes)
+server.use('/api/v1/user', userRoutes)
 server.use('/api/v1/auth', authRoutes)
 server.use('/api/v1/dishes', dishesRoutes)
 server.use('/api/v1/category', categoryRoutes)

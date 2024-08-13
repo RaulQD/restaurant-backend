@@ -29,8 +29,7 @@ export class AuthController {
       const saveUser = await user.save()
       return res.status(201).json({ message: 'Cuenta creada exitosamente', status: true, data: saveUser })
     } catch (error) {
-      console.log('error', error)
-      res.status(500).json({ message: 'Internal server error' })
+      res.status(500).json({ error: error.message })
     }
   }
 
@@ -39,28 +38,26 @@ export class AuthController {
       const { email, password } = req.body
       const user = await User.findOne({ email })
       if (!user) {
-        const error = new Error('Usuario no existe')
+        const error = new Error('El usuario o contraseña son incorrectos')
         return res.status(404).json({ error: error.message, status: false })
       }
       const isPasswordMatch = await checkCompare(password, user.password)
       if (!isPasswordMatch) {
-        const error = new Error('Contraseña incorrecta')
+        const error = new Error('El usuario o contraseña son incorrectos')
         return res.status(400).json({ error: error.message, status: false })
       }
       const token = generateJWT({ id: user._id })
       // OBETENER SOLO LOS ROLES DEL USUARIO Y NO TODA LA INFORMACION
-      const userRoles = await Role.find({ _id: { $in: user.roles } })
-      const userObject = {
+      const userRoles = await Role.find({ _id: { $in: user.roles } }).select('name -_id')
+      const roles = userRoles.map(role => role.name)
+      const data = {
         firstName: user.firstName,
         lastName: user.lastName,
-        roles: userRoles
+        roles
       }
-      console.log('userRoles', userRoles)
-
-      return res.status(200).json({ data: { user: userObject, token } })
+      return res.status(200).json({ data, token })
     } catch (error) {
-      console.log('error', error)
-      return res.status(500).json({ message: 'Internal server error' })
+      return res.status(500).json({ error: error.message })
     }
   }
 
@@ -69,7 +66,7 @@ export class AuthController {
       const { email } = req.body
       const user = await User.findOne({ email })
       if (!user) {
-        const error = new Error('El usuario no existe')
+        const error = new Error('No se ha podido enviar las instrucciones, verifique el correo')
         return res.status(404).json({ error: error.message, status: false })
       }
       if (!email || email.trim() === '') {
