@@ -4,7 +4,7 @@ import { Role } from '../models/Role.js'
 import { Token } from '../models/Token.js'
 import { User } from '../models/Users.js'
 import { checkCompare, hashPassword } from '../utils/bcrypt.js'
-import { generateTokenPasswordReset } from '../utils/Token.js'
+import { generateTokenPasswordReset } from '../utils/token.js'
 import jwt from 'jsonwebtoken'
 
 export class AuthController {
@@ -27,6 +27,7 @@ export class AuthController {
         user.roles = [role._id]
       }
       const saveUser = await user.save()
+      console.log('SAVEUSER', saveUser)
       return res.status(201).json({ message: 'Cuenta creada exitosamente', status: true, data: saveUser })
     } catch (error) {
       res.status(500).json({ error: error.message })
@@ -47,15 +48,17 @@ export class AuthController {
         return res.status(400).json({ error: error.message, status: false })
       }
       const token = generateJWT({ id: user._id })
-      // OBETENER SOLO LOS ROLES DEL USUARIO Y NO TODA LA INFORMACION
-      const userRoles = await Role.find({ _id: { $in: user.roles } }).select('name -_id')
-      const roles = userRoles.map(role => role.name)
+      // OBTENER EL NOMBRE DEL ROL, PARA MOSTRARLO EN EL FRONTEND Y PROTEGER LAS RUTAS DEPENDIENDO DEL ROL
+      const roles = await Role.find({ _id: { $in: user.roles } })
       const data = {
+        _id: user._id,
         firstName: user.firstName,
         lastName: user.lastName,
-        roles
+        email: user.email,
+        rol: roles,
+        token
       }
-      return res.status(200).json({ data, token })
+      return res.status(200).json(data)
     } catch (error) {
       return res.status(500).json({ error: error.message })
     }
@@ -83,7 +86,7 @@ export class AuthController {
         name: user.firstName,
         token: token.token
       })
-      return res.status(200).json({ message: 'Se ha enviado un correo para restablecer la contraseña', status: true })
+      return res.status(200).json({ message: 'Se ha enviado un correo para restablecer la contraseña.', status: true })
     } catch (error) {
       return res.status(500).json({ error: error.message })
     }

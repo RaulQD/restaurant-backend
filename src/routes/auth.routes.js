@@ -6,7 +6,7 @@ import { validateToken } from '../middlewares/auth.js'
 const routes = Router()
 
 routes.post('/login', AuthController.login)
-routes.post('/register', validateInputs, validatePassword, AuthController.createAccount)
+routes.post('/register', validateInputs, AuthController.createAccount)
 routes.post('/forgot-password', AuthController.resetPassword)
 routes.post('/update-password/:token', validatePassword, AuthController.changePassword)
 routes.post('/validate-token', AuthController.validateToken)

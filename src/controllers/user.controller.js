@@ -1,6 +1,13 @@
+import { User } from '../models/Users.js'
+
 export class UserController {
   static async getCurrentUser (req, res) {
-    return res.json(req.user)
+    // OBTENER EL USUARIO CON SU RESPECTIVO ROL
+    const user = await User.findById(req.user.id).populate('roles')
+    console.log(user)
+
+    // console.log(req.user)
+    return res.json(user)
   }
 
   static async getUsers (req, res) {
