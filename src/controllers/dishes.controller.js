@@ -30,8 +30,7 @@ export class DishesController {
       await dishes.save()
       return res.status(201).json({ message: 'Plato creado exitosamente', status: 201, data: dishes })
     } catch (error) {
-      console.error('Error al crear el plato:', error)
-      return res.status(500).json({ message: 'Error al crear el plato:', status: 500, route: req.originalUrl })
+      return res.status(500).json({ error: error.messag, status: 500, route: req.originalUrl })
     }
   }
 
@@ -51,11 +50,9 @@ export class DishesController {
           .populate('category'),
         Dishes.countDocuments(query)
       ])
-      console.log('dishes', dishes)
       return res.json({ result: dishes, pagination: { page: pageNumber, limit: limitNumber, totalDishes } })
     } catch (error) {
-      console.error('Error al obtener los platos:', error)
-      return res.status(500).json({ message: 'Error al obtener los platos:', status: 500, route: req.originalUrl })
+      return res.status(500).json({ error: error.message, status: 500, route: req.originalUrl })
     }
   }
 
@@ -102,8 +99,7 @@ export class DishesController {
       await dish.save()
       return res.status(200).json({ message: 'Plato actualizado exitosamente', status: 200, data: dish })
     } catch (error) {
-      console.error('Error al actualizar el plato:', error)
-      return res.status(500).json({ message: 'Error al actualizar el plato:', status: 500, route: req.originalUrl })
+      return res.status(500).json({ error: error.message, status: 500, route: req.originalUrl })
     }
   }
 
@@ -118,8 +114,7 @@ export class DishesController {
       await dish.deleteOne()
       return res.status(200).json({ message: 'Plato eliminado exitosamente', status: 200 })
     } catch (error) {
-      console.error('Error al eliminar el plato:', error)
-      return res.status(500).json({ message: 'Error al eliminar el plato:', status: 500, route: req.originalUrl })
+      return res.status(500).json({ error: error.message, status: 500, route: req.originalUrl })
     }
   }
 
@@ -142,8 +137,7 @@ export class DishesController {
       await dishStatus.save()
       return res.status(200).json({ message: 'Estado  actualizado exitosamente', status: 200 })
     } catch (error) {
-      console.error('Error al actualizar el estado del plato:', error)
-      return res.status(500).json({ message: 'Error al actualizar el estado del plato:', status: 500, route: req.originalUrl })
+      return res.status(500).json({ error: error.message, status: 500, route: req.originalUrl })
     }
   }
 }

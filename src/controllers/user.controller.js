@@ -4,9 +4,6 @@ export class UserController {
   static async getCurrentUser (req, res) {
     // OBTENER EL USUARIO CON SU RESPECTIVO ROL
     const user = await User.findById(req.user.id).populate('roles')
-    console.log(user)
-
-    // console.log(req.user)
     return res.json(user)
   }
 
@@ -18,7 +15,7 @@ export class UserController {
     res.send('getClient')
   }
 
-  static async updateClient (req, res) {
+  static async updateUser (req, res) {
     res.send('updateClient')
   }
 

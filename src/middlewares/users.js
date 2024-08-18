@@ -38,8 +38,6 @@ export const validateInputs = (req, res, next) => {
 // VALIDAR SI EL PASSWORD ES EL MISMO QUE EL DE CONFIRMACION
 export const validatePassword = (req, res, next) => {
   const { password, confirmPassword } = req.body
-  console.log('password', password)
-  console.log('confirmPassword', confirmPassword)
 
   if (!password || !confirmPassword) {
     const error = new Error('Ambas contraseñas son requeridas')
@@ -47,6 +45,10 @@ export const validatePassword = (req, res, next) => {
   }
   if (password !== confirmPassword) {
     const error = new Error('Las contraseñas no coinciden')
+    return res.status(400).json({ error: error.message, status: false })
+  }
+  if (!password) {
+    const error = new Error('La contraseña es requerida')
     return res.status(400).json({ error: error.message, status: false })
   }
   next()
