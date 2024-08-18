@@ -130,4 +130,38 @@ export class AuthController {
       return res.status(500).json({ error: error.message })
     }
   }
+
+  static async updateProfile (req, res) {
+    const { firstName, lastName, phone } = req.body
+    req.user.firstName = firstName
+    req.user.lastName = lastName
+    req.user.phone = phone
+    try {
+      await req.user.save()
+      return res.status(200).json({ message: 'Cambios guardados con exito.', status: true })
+    } catch (error) {
+      return res.status(500).json({ error: error.message })
+    }
+  }
+
+  static async updateCurrentUserPassword (req, res) {
+    const { current_password, password } = req.body
+    try {
+      // OBTENER EL USUARIO ACTUAL
+      const user = await User.findById(req.user.id)
+      // COMPARAR LA CONTRASEÑA ACTUAL CON LA QUE SE ENVIO EN EL BODY
+      const isPasswordMatch = await checkCompare(current_password, user.password)
+      // SI NO COINCIDEN, RETORNAR UN ERROR
+      if (!isPasswordMatch) {
+        const error = new Error('La contraseña actual es incorrecta.')
+        return res.status(401).json({ error: error.message, status: false })
+      }
+      // SI COINCIDEN, HASHEAR LA NUEVA CONTRASEÑA Y ACTUALIZARLA
+      user.password = await hashPassword(password)
+      await user.save()
+      return res.status(200).json({ message: 'Contraseña actualizada correctamente', status: true })
+    } catch (error) {
+      return res.status(500).json({ error: error.message })
+    }
+  }
 }

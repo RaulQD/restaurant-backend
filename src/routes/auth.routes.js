@@ -10,5 +10,7 @@ routes.post('/register', validateInputs, AuthController.createAccount)
 routes.post('/forgot-password', AuthController.resetPassword)
 routes.post('/update-password/:token', validatePassword, AuthController.changePassword)
 routes.post('/validate-token', AuthController.validateToken)
+routes.put('/profile', validateToken, AuthController.updateProfile)
+routes.put('/update-password', validateToken, validatePassword, AuthController.updateCurrentUserPassword)
 
 export default routes
