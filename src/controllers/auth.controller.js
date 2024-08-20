@@ -10,7 +10,7 @@ import jwt from 'jsonwebtoken'
 export class AuthController {
   static async createAccount (req, res) {
     try {
-      const { email, password, roles, confirmPassword } = req.body
+      const { email, password, roles } = req.body
       const emailExist = await User.findOne({ email })
       if (emailExist) {
         const error = new Error('El correo ya se encuentra registrado')
@@ -27,7 +27,6 @@ export class AuthController {
         user.roles = [role._id]
       }
       const saveUser = await user.save()
-      console.log('SAVEUSER', saveUser)
       return res.status(201).json({ message: 'Cuenta creada exitosamente', status: true, data: saveUser })
     } catch (error) {
       res.status(500).json({ error: error.message })
@@ -149,6 +148,12 @@ export class AuthController {
     try {
       // OBTENER EL USUARIO ACTUAL
       const user = await User.findById(req.user.id)
+
+      if (!current_password) {
+        const error = new Error('Ingresa la contraseña actual.')
+        return res.status(400).json({ error: error.message, status: false })
+      }
+
       // COMPARAR LA CONTRASEÑA ACTUAL CON LA QUE SE ENVIO EN EL BODY
       const isPasswordMatch = await checkCompare(current_password, user.password)
       // SI NO COINCIDEN, RETORNAR UN ERROR

@@ -26,7 +26,6 @@ export const validateToken = async (req, res, next) => {
     // 1. TOKEN EXPIRADO
     // 2. TOKEN INVALIDO
     // 3. TOKEN NO ENVIADO
-    console.log('error', error)
     return res.status(500).json({ message: 'Token no valido' })
   }
   next()

@@ -1,4 +1,4 @@
-import mongoose, { Schema } from 'mongoose'
+import mongoose, { Schema, Types } from 'mongoose'
 
 const userSchema = new Schema({
   email: { type: String, required: true, trim: true, unique: true, lowercase: true },
@@ -7,9 +7,12 @@ const userSchema = new Schema({
   lastName: { type: String, required: true, trim: true },
   dni: { type: String, required: true, trim: true },
   phone: { type: String, trim: true },
-  address: { type: String, trim: true },
+  address: [{
+    type: Types.ObjectId,
+    ref: 'Address'
+  }],
   image: { type: String },
-  roles: [{ ref: 'Role', type: Schema.Types.ObjectId }]
+  roles: [{ ref: 'Role', type: Types.ObjectId }]
 }, {
   timestamps: true
 })

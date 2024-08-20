@@ -18,12 +18,6 @@ export class DishesController {
         const error = new Error('La categoria no existe')
         return res.status(404).json({ error: error.message, status: 404 })
       }
-
-      // AGREGAR UNA IMAGEN POR DEFECTO
-      // const defaultImageUrl = '.https://res.cloudinary.com/dekcwdwcl/image/upload/v1722888130/no-image_zlqdcz.jpg'
-      // if (!req.files?.images) {
-      //   req.body.images = defaultImageUrl
-      // }
       const dishes = new Dishes(req.body)
       dishes.user = req.user._id
       dishes.category = category

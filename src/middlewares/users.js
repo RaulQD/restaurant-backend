@@ -1,5 +1,5 @@
 export const validateInputs = (req, res, next) => {
-  const { email, password, firstName, lastName, dni, phone, address } = req.body
+  const { email, password, firstName, lastName, dni, phone } = req.body
   if (!email || email.trim() === '') {
     const error = new Error('Ingresa un correo electrónico')
     return res.status(400).json({ error: error.message, status: false })
@@ -28,10 +28,6 @@ export const validateInputs = (req, res, next) => {
     const error = new Error('Ingresa tu número de teléfono')
     return res.status(400).json({ error: error.message, status: false })
   }
-  if (!address || address.trim() === '') {
-    const error = new Error('Ingresa tu dirección')
-    return res.status(400).json({ error: error.message, status: false })
-  }
   next()
 }
 
@@ -49,6 +45,37 @@ export const validatePassword = (req, res, next) => {
   }
   if (!password) {
     const error = new Error('La contraseña es requerida')
+    return res.status(400).json({ error: error.message, status: false })
+  }
+  next()
+}
+
+// VALIDAR LOS CAMPOS DE LA DIRECCIÓN
+export const validateAddress = (req, res, next) => {
+  const { street, number, city, department, district } = req.body
+
+  if (!street || street.trim() === '') {
+    const error = new Error('La calle es requerida')
+    return res.status(400).json({ error: error.message, status: false })
+  }
+  if (street.length < 10) {
+    const error = new Error('La calle debe tener al menos 10 caracteres')
+    return res.status(400).json({ error: error.message, status: false })
+  }
+  if (!number || number.trim() === '') {
+    const error = new Error('El número es requerido')
+    return res.status(400).json({ error: error.message, status: false })
+  }
+  if (!city || city.trim() === '') {
+    const error = new Error('La ciudad es requerida')
+    return res.status(400).json({ error: error.message, status: false })
+  }
+  if (!department || department.trim() === '') {
+    const error = new Error('El departamento es requerido')
+    return res.status(400).json({ error: error.message, status: false })
+  }
+  if (!district || district.trim() === '') {
+    const error = new Error('El distrito es requerido')
     return res.status(400).json({ error: error.message, status: false })
   }
   next()
