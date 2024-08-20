@@ -14,7 +14,6 @@ addressSchema.set('toJSON', {
   versionKey: false,
   transform: function (doc, ret, options) {
     delete ret._id
-    delete ret.user
   }
 })
 

@@ -7,8 +7,6 @@ const routes = Router()
 
 routes.get('/', UserController.getUsers)
 routes.get('/current-user', validateToken, UserController.getCurrentUser)
-routes.post('/create-address', validateToken, validateAddress, UserController.createAddress)
-
 // routes.put('/update-user', validateToken, UserController.updateUser)
 // routes.get('/:id', UserController.getUserByIdWithRole)
 // routes.post('/', UserController.createUser)

@@ -13,6 +13,7 @@ import authRoutes from './routes/auth.routes.js'
 import dishesRoutes from './routes/dishes.routes.js'
 import categoryRoutes from './routes/category.routes.js'
 import uploadRoutes from './routes/uploads.routes.js'
+import addressRoutes from './routes/address.routes.js'
 dotenv.config()
 connectDB()
 
@@ -32,6 +33,7 @@ server.use('/api/v1/auth', authRoutes)
 server.use('/api/v1/dishes', dishesRoutes)
 server.use('/api/v1/category', categoryRoutes)
 server.use('/api/v1/uploads', uploadRoutes)
+server.use('/api/v1/address', addressRoutes)
 
 // DOCS
 server.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec))
