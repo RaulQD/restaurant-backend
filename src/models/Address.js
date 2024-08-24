@@ -3,9 +3,10 @@ import mongoose, { Schema, Types } from 'mongoose'
 const addressSchema = new Schema({
   street: { type: String, required: true, trim: true },
   number: { type: String, required: true, trim: true },
-  city: { type: String, required: true, trim: true },
+  provinces: { type: String, required: true, trim: true },
   department: { type: String, required: true, trim: true },
   district: { type: String, required: true, trim: true },
+  references: { type: String, trim: true },
   user: { ref: 'User', type: Types.ObjectId }
 })
 

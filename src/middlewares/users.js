@@ -52,7 +52,7 @@ export const validatePassword = (req, res, next) => {
 
 // VALIDAR LOS CAMPOS DE LA DIRECCIÓN
 export const validateAddress = (req, res, next) => {
-  const { street, number, city, department, district } = req.body
+  const { street, number, provinces, department, district } = req.body
 
   if (!street || street.trim() === '') {
     const error = new Error('La calle es requerida')
@@ -66,8 +66,8 @@ export const validateAddress = (req, res, next) => {
     const error = new Error('El número es requerido')
     return res.status(400).json({ error: error.message, status: false })
   }
-  if (!city || city.trim() === '') {
-    const error = new Error('La ciudad es requerida')
+  if (!provinces || provinces.trim() === '') {
+    const error = new Error('La provincia es requerida')
     return res.status(400).json({ error: error.message, status: false })
   }
   if (!department || department.trim() === '') {
