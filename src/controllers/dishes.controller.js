@@ -30,11 +30,19 @@ export class DishesController {
 
   static async getDishes (req, res) {
     try {
-      const { page = 1, limit = 10 } = req.query
+      const { category, page = 1, limit = 10, keyword } = req.query
       const query = { status: 'active' }
       // CONVERTIR EL LIMIT Y PAGE A NUMEROS
       const limitNumber = Number(limit)
       const pageNumber = Number(page)
+
+      if (keyword) {
+        query.name = { $regex: keyword, $options: 'i' }
+      }
+      if (category) {
+        const categoryExist = await Category.findOne({ name: { $regex: category, $options: 'i' } })
+        if (categoryExist) query.category = categoryExist._id
+      }
 
       const [dishes, totalDishes] = await Promise.all([
         Dishes.find(query)
@@ -79,17 +87,6 @@ export class DishesController {
         const error = new Error('El plato no existe.')
         return res.status(404).json({ error: error.message, status: 404 })
       }
-      // ACTUALIZAR UNA IMAGEN
-      // if (req.files?.images) {
-      //   const nameArr = dish.images.split('/')
-      //   const nameFile = nameArr[nameArr.length - 1]
-      //   const [public_id] = nameFile.split('.')
-      //   await deleteImage(public_id)
-      // }
-      // const { tempFilePath } = req.files.images
-      // const { secure_url } = await uploadImage(tempFilePath)
-      // fs.unlinkSync(tempFilePath)
-      // dish.images = secure_url
       await dish.save()
       return res.status(200).json({ message: 'Plato actualizado exitosamente', status: 200, data: dish })
     } catch (error) {
@@ -130,6 +127,30 @@ export class DishesController {
       }
       await dishStatus.save()
       return res.status(200).json({ message: 'Estado  actualizado exitosamente', status: 200 })
+    } catch (error) {
+      return res.status(500).json({ error: error.message, status: 500, route: req.originalUrl })
+    }
+  }
+
+  static async getDishesByCategoryName (req, res) {
+    try {
+      const { category } = req.query
+
+      // VALIDAR SI LA CATEGOIA EXISTE
+      const categoryExist = await Category.findOne({ name: { $regex: category, $options: 'i' } })
+      if (!categoryExist) {
+        const error = new Error('La categoria no existe')
+        return res.status(404).json({ error: error.message, status: 404 })
+      }
+      // OBTENER EL ID DE LA CATEGORIA
+      const categoryID = categoryExist._id
+      // OBTENER LOS PLATOS DE LA CATEGORIA
+      const dishes = await Dishes.find({ category: categoryID }).populate('category')
+      if (!dishes.length) {
+        const error = new Error('No hay platos en esta categoria')
+        return res.status(404).json({ error: error.message, status: 404 })
+      }
+      return res.json(dishes)
     } catch (error) {
       return res.status(500).json({ error: error.message, status: 500, route: req.originalUrl })
     }
