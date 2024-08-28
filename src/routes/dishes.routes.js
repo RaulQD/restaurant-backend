@@ -2,12 +2,13 @@ import { Router } from 'express'
 
 import { DishesController } from '../controllers/dishes.controller.js'
 import { validateDishes, validateDishesIdExist } from '../middlewares/dishes.js'
-import { isAdmin, isUser, validateToken } from '../middlewares/auth.js'
+import { isAdmin, validateToken } from '../middlewares/auth.js'
+import { validateCategoryIdExist } from '../middlewares/category.js'
 
 const routes = Router()
 
 routes.get('/', DishesController.getDishes)
-routes.get('/findDishesByCategoryName', validateToken, DishesController.getDishesByCategoryName)
+routes.get('/findDishesByCategory', validateToken, DishesController.getDishesByCategoryName)
 routes.post('/', validateToken, isAdmin, validateDishes, DishesController.createDishes)
 routes.get('/:id', validateDishesIdExist, DishesController.getDishById)
 routes.put('/:id', validateToken, isAdmin, validateDishesIdExist, DishesController.updateDishes)

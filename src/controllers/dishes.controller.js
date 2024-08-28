@@ -135,7 +135,6 @@ export class DishesController {
   static async getDishesByCategoryName (req, res) {
     try {
       const { category } = req.query
-
       // VALIDAR SI LA CATEGOIA EXISTE
       const categoryExist = await Category.findOne({ name: { $regex: category, $options: 'i' } })
       if (!categoryExist) {
