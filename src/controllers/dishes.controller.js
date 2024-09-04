@@ -135,8 +135,19 @@ export class DishesController {
   static async getDishesByCategoryName (req, res) {
     try {
       const { category } = req.query
+
+      // VALIDAR SI LA CATEGORIA ESTA VACIA
+      if (!category) {
+        const dishes = await Dishes.find().populate('category')
+        if (!dishes.length) {
+          const error = new Error('No hay platos en esta categoria')
+          return res.status(404).json({ error: error.message, status: 404 })
+        }
+        return res.json(dishes)
+      }
+
       // VALIDAR SI LA CATEGOIA EXISTE
-      const categoryExist = await Category.findOne({ name: { $regex: category, $options: 'i' } })
+      const categoryExist = await Category.findOne({ name: category })
       if (!categoryExist) {
         const error = new Error('La categoria no existe')
         return res.status(404).json({ error: error.message, status: 404 })

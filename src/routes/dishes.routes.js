@@ -8,7 +8,7 @@ import { validateCategoryIdExist } from '../middlewares/category.js'
 const routes = Router()
 
 routes.get('/', DishesController.getDishes)
-routes.get('/findDishesByCategory', validateToken, DishesController.getDishesByCategoryName)
+routes.get('/findDishesByCategory', DishesController.getDishesByCategoryName)
 routes.post('/', validateToken, isAdmin, validateDishes, DishesController.createDishes)
 routes.get('/:id', validateDishesIdExist, DishesController.getDishById)
 routes.put('/:id', validateToken, isAdmin, validateDishesIdExist, DishesController.updateDishes)
