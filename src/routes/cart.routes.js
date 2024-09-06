@@ -4,7 +4,7 @@ import { CartController } from '../controllers/cart.controller.js'
 
 const routes = Router()
 
-routes.get('/', validateToken, CartController.getCart)
+routes.get('/:userId', validateToken, CartController.getCart)
 routes.post('/', validateToken, CartController.addToCart)
 routes.put('/', validateToken, CartController.updateToCart)
 routes.delete('/', validateToken, CartController.removeAllCart)
