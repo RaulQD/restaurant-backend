@@ -33,15 +33,15 @@ export const validateToken = async (req, res, next) => {
 
 /**
  * The function `checkRole` checks if a user has a specific role before allowing access to a route.
- * @param requireRole - The `requireRole` parameter in the `checkRole` function is the role that is
- * required to access a specific route or perform a certain action. This function is designed to check
- * if the authenticated user has the required role in order to proceed with the request. If the user
- * does not have the required
+ * @param requireRole - The `requireRole` parameter in the `checkRole` function represents the role
+ * that is required to access a specific route or perform a particular action. This function is
+ * designed to be used as middleware in an Express application to check if the authenticated user has
+ * the necessary role to proceed.
  * @returns The `checkRole` function returns a middleware function that checks if the authenticated
  * user has a specific role required to access a certain route. If the user has the required role, the
  * middleware calls the `next()` function to proceed to the next middleware or route handler. If the
  * user does not have the required role, it returns a 401 status with an error message indicating the
- * missing role. If there
+ * lack of necessary permissions.
  */
 export const checkRole = (requireRole) => async (req, res, next) => {
   try {

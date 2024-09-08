@@ -6,8 +6,10 @@ const routes = Router()
 
 routes.get('/:userId', validateToken, CartController.getCart)
 routes.post('/', validateToken, CartController.addToCart)
-routes.put('/', validateToken, CartController.updateToCart)
+// routes.put('/', validateToken, CartController.updateToCart)
+routes.put('/increase', validateToken, CartController.increaseQuantity)
+routes.put('/decrease', validateToken, CartController.decreaseQuantity)
+routes.delete('/:userId/:dishId', validateToken, CartController.removeFromCart)
 routes.delete('/', validateToken, CartController.removeAllCart)
-routes.delete('/:id', validateToken, CartController.removeFromCart)
 
 export default routes
