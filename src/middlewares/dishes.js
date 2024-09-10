@@ -1,4 +1,5 @@
 import mongoose from 'mongoose'
+import { Dishes } from '../models/Dishes.js'
 
 export const validateDishesIdExist = async (req, res, next) => {
   try {
@@ -11,6 +12,21 @@ export const validateDishesIdExist = async (req, res, next) => {
     next()
   } catch (error) {
     return res.status(500).json({ message: 'Error al obtener la plato', status: 500, route: req.originalUrl })
+  }
+}
+
+export const dishesExist = async (req, res, next) => {
+  try {
+    const { id } = req.params
+    const dish = await Dishes.findById(id)
+    if (!dish) {
+      const error = new Error('El plato no existe.')
+      return res.status(404).json({ error: error.message, status: 404 })
+    }
+    req.dish = dish
+    next()
+  } catch (error) {
+    return res.status(500).json({ message: 'Error al obtener el plato', status: 500, route: req.originalUrl })
   }
 }
 

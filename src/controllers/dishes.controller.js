@@ -60,7 +60,8 @@ export class DishesController {
 
   static async getDishById (req, res) {
     try {
-      const dish = await Dishes.findById(req.params.id)
+      const { id } = req.params
+      const dish = await Dishes.findById(id).populate('category')
       if (!dish) {
         const error = new Error('Plato no encontrado')
         return res.status(404).json({ error: error.message })
@@ -73,21 +74,15 @@ export class DishesController {
 
   static async updateDishes (req, res) {
     try {
-      const { id } = req.params
       const { name } = req.body
       if (name) {
-        const dishWithSameName = await Dishes.findOne({ name, _id: { $ne: id } })
+        const dishWithSameName = await Dishes.findOne({ name, _id: { $ne: req.dish.id } })
         if (dishWithSameName) {
           const error = new Error('El nombre del plato ya existe.')
           return res.status(409).json({ error: error.message, status: 409 })
         }
       }
-      const dish = await Dishes.findByIdAndUpdate(id, req.body)
-      if (!dish) {
-        const error = new Error('El plato no existe.')
-        return res.status(404).json({ error: error.message, status: 404 })
-      }
-      await dish.save()
+      const dish = await req.dish.save()
       return res.status(200).json({ message: 'Plato actualizado exitosamente', status: 200, data: dish })
     } catch (error) {
       return res.status(500).json({ error: error.message, status: 500, route: req.originalUrl })
@@ -96,13 +91,7 @@ export class DishesController {
 
   static async removeDishes (req, res) {
     try {
-      const { id } = req.params
-      const dish = await Dishes.findById(id)
-      if (!dish) {
-        const error = new Error('El plato no existe.')
-        return res.status(404).json({ error: error.message, status: 404 })
-      }
-      await dish.deleteOne()
+      await req.dish.deleteOne()
       return res.status(200).json({ message: 'Plato eliminado exitosamente', status: 200 })
     } catch (error) {
       return res.status(500).json({ error: error.message, status: 500, route: req.originalUrl })
@@ -111,22 +100,10 @@ export class DishesController {
 
   static async updatedDishesStatus (req, res) {
     try {
-      const { id } = req.params
       const { status } = req.body
-      // VALIDAR SI EL ESTADO ES VALIDO
-      const validStatus = Object.values(statusDishes)
-      if (!validStatus.includes(status.toLowerCase())) {
-        const error = new Error('El estado del plato no es valido ')
-        return res.status(400).json({ error: error.message, status: 400 })
-      }
-      // ACTUALIZAR EL ESTADO DEL PLATO
-      const dishStatus = await Dishes.findByIdAndUpdate(id, { status: status.toLowerCase() })
-      if (!dishStatus) {
-        const error = new Error('El plato no existe')
-        return res.status(404).json({ error: error.message, status: 404 })
-      }
-      await dishStatus.save()
-      return res.status(200).json({ message: 'Estado  actualizado exitosamente', status: 200 })
+      req.dish.status = status
+      await req.dish.save()
+      return res.status(200).json({ message: 'Plato actualizado', status: 200 })
     } catch (error) {
       return res.status(500).json({ error: error.message, status: 500, route: req.originalUrl })
     }
@@ -145,7 +122,6 @@ export class DishesController {
         }
         return res.json(dishes)
       }
-
       // VALIDAR SI LA CATEGOIA EXISTE
       const categoryExist = await Category.findOne({ name: category })
       if (!categoryExist) {
