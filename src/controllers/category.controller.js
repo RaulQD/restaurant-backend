@@ -1,5 +1,6 @@
 import mongoose from 'mongoose'
 import { Category } from '../models/Category.js'
+import { Dishes } from '../models/Dishes.js'
 
 export class CategoryController {
   static async createCategory (req, res) {
@@ -31,7 +32,7 @@ export class CategoryController {
 
   static async getCategoryById (req, res) {
     try {
-      return res.status(200).json({ message: 'Categoria encontrada', status: 200, data: req.category })
+      return res.status(200).json(req.category)
     } catch (error) {
       console.log('Error al obtener la categoria:', error)
       return res.status(500).json({ message: 'Error al obtener la categoria:', status: 500, route: req.originalUrl })
@@ -41,7 +42,7 @@ export class CategoryController {
   static async updateCategory (req, res) {
     try {
       const { id } = req.params
-      const { name, available } = req.body
+      const { name } = req.body
       if (name) {
         const nameExist = await Category.findOne({ name, _id: { $ne: id } })
         if (nameExist) {
@@ -50,7 +51,6 @@ export class CategoryController {
         }
       }
       req.category.name = name
-      req.category.available = available
       await req.category.save()
       return res.status(200).json({ message: 'Categoria actualizada exitosamente', status: 200 })
     } catch (error) {
@@ -66,6 +66,12 @@ export class CategoryController {
         const error = new Error('La categoria no existe')
         return res.status(404).json({ error: error.message, status: 404 })
       }
+      const associatedDishes = await Dishes.find({ category: req.params.id })
+      if (associatedDishes.length > 0) {
+        const error = new Error('No se puede eliminar esta categoria porque tiene platos asociados')
+        return res.status(409).json({ error: error.message, status: 409 })
+      }
+
       await category.deleteOne()
       return res.status(200).json({ message: 'Categoria eliminada exitosamente', status: 200 })
     } catch (error) {

@@ -35,7 +35,6 @@ export class DishesController {
       // CONVERTIR EL LIMIT Y PAGE A NUMEROS
       const limitNumber = Number(limit)
       const pageNumber = Number(page)
-
       if (keyword) {
         query.name = { $regex: keyword, $options: 'i' }
       }
@@ -43,7 +42,6 @@ export class DishesController {
         const categoryExist = await Category.findOne({ name: { $regex: category, $options: 'i' } })
         if (categoryExist) query.category = categoryExist._id
       }
-
       const [dishes, totalDishes] = await Promise.all([
         Dishes.find(query)
           .skip((page - 1) * limit)
@@ -61,7 +59,7 @@ export class DishesController {
   static async getDishById (req, res) {
     try {
       const { id } = req.params
-      const dish = await Dishes.findById(id).populate('category')
+      const dish = await Dishes.findById(id)
       if (!dish) {
         const error = new Error('Plato no encontrado')
         return res.status(404).json({ error: error.message })
@@ -82,8 +80,13 @@ export class DishesController {
           return res.status(409).json({ error: error.message, status: 409 })
         }
       }
-      const dish = await req.dish.save()
-      return res.status(200).json({ message: 'Plato actualizado exitosamente', status: 200, data: dish })
+      // Actualiza los campos del plato con los datos proporcionados
+      req.dish.name = req.body.name
+      req.dish.description = req.body.description
+      req.dish.originalPrice = req.body.originalPrice
+      req.dish.category = req.body.category
+      await req.dish.save()
+      return res.status(200).json({ message: 'Plato actualizado exitosamente', status: 200, data: req.dish })
     } catch (error) {
       return res.status(500).json({ error: error.message, status: 500, route: req.originalUrl })
     }
