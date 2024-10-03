@@ -19,7 +19,9 @@ export class DishesController {
         return res.status(404).json({ error: error.message, status: 404 })
       }
       const dishes = new Dishes(req.body)
+      // INSTANCIAMOS EL USUARIO QUE CREO EL PLATO
       dishes.user = req.user._id
+      // INSTANCIAMOS LA CATEGORIA DEL PLATO
       dishes.category = category
       await dishes.save()
       return res.status(201).json({ message: 'Plato creado exitosamente', status: 201, data: dishes })

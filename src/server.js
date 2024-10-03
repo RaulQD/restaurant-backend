@@ -15,6 +15,7 @@ import categoryRoutes from './routes/category.routes.js'
 import uploadRoutes from './routes/uploads.routes.js'
 import addressRoutes from './routes/address.routes.js'
 import cartRoutes from './routes/cart.routes.js'
+import orderRoutes from './routes/order.routes.js'
 
 dotenv.config()
 connectDB()
@@ -37,6 +38,7 @@ server.use('/api/v1/category', categoryRoutes)
 server.use('/api/v1/uploads', uploadRoutes)
 server.use('/api/v1/address', addressRoutes)
 server.use('/api/v1/cart', cartRoutes)
+server.use('/api/v1/orders', orderRoutes)
 
 // DOCS
 server.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec))

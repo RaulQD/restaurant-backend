@@ -11,12 +11,7 @@ const userSchema = new Schema({
     type: Types.ObjectId,
     ref: 'Address'
   }],
-  // cart: [{
-  //   dishId: { type: Types.ObjectId, ref: 'Dishes' },
-  //   quantity: {
-  //     type: Number, required: true, min: 1
-  //   }
-  // }],
+
   image: { type: String },
   roles: [{ ref: 'Role', type: Types.ObjectId }]
 }, {

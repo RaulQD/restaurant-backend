@@ -56,6 +56,5 @@ export const validateDishes = (req, res, next) => {
   if (isNaN(parsedprice)) {
     return res.status(400).json({ message: 'El precio no es valido.', status: 400 })
   }
-
   next()
 }
